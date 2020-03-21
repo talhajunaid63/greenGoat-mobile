@@ -123,7 +123,7 @@ export default class WishListScreen extends React.Component {
   send_enquiry = () => {
     this.setModalVisible(!this.state.modalVisible);
     Alert.alert(
-      "Sorry!! Your request cannot bbe processed right now. Please try again later"
+      "Sorry!! Your request cannot be processed right now. Please try again later"
     );
   };
 

@@ -482,10 +482,10 @@ for (var i = 0; i < arrayLength_state; i++) {
 }
 
 const typeData = [
-  { id: "gut", name: "Gut reno" },
-  { id: "full", name: "Full tear down" }, // set default checked for render option item
-  { id: "kitchen", name: "Kitchen/Bath renovation" },
-  { id: "other", name: "other" }
+  { id: "gut", name: "Gut Reno" },
+  { id: "full", name: "Complete Demo" }, // set default checked for render option item
+  { id: "kitchen", name: "Kitchen/Bath Renovation" },
+  { id: "other", name: "Other" }
 ];
 
 class step0 extends Component {
@@ -957,12 +957,23 @@ export class step4 extends Component {
       <View>
         <View style={{ marginTop: 30 }}>
           <Button
-            title="Submit Donation Application"
+            title="Calculate"
             raised={true}
             buttonStyle={styles.submit_button}
             onPress={this.nextStep}
             // onPress={() => this.donationformsubmission()}
           />
+        </View>
+        <View
+          style={{
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+            display: "flex",
+            marginTop: 15
+          }}
+        >
+          <Text style={{ color: "red" }}>This is not an appraisal</Text>
         </View>
         <View style={styles.stepsbtnContainer}>
           <TouchableOpacity onPress={this.props.back} style={styles.btnStyle}>
@@ -1060,7 +1071,10 @@ export default class DonationScreen extends React.Component {
       fetch("http://167.172.245.215/projects/zillow-flow", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "access-token": await AsyncStorage.getItem("userToken"),
+          uid: await AsyncStorage.getItem("uid"),
+          client: await AsyncStorage.getItem("client")
         },
         body: JSON.stringify({
           address: this.state.address,
@@ -1078,7 +1092,7 @@ export default class DonationScreen extends React.Component {
           this.showAlert();
         })
         .catch(err => {
-          console.log("fetch", err);
+          this.hideAlert();
         });
 
       // Alert.alert('Success', 'Please check you email for response. Thankyou !')

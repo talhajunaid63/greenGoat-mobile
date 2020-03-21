@@ -88,11 +88,13 @@ export default class MarketPlaceScreen extends React.Component {
       backup_data_group: [],
       modalVisible: false,
       filtermodalVisible: false,
+      filtertitle: "",
       minvalue: 0,
-      maxvalue: 100000,
+      maxvalue: 10000,
       category: "Electronics",
       installation: "Yes",
       progress: true,
+      categoryid: 1,
       categorydata: [
         {
           value: "Electronics"
@@ -121,6 +123,7 @@ export default class MarketPlaceScreen extends React.Component {
     this.focusListener = navigation.addListener("didFocus", () => {
       this.renderMyData();
       this.get_group_items();
+      this.get_categories_data();
     });
   }
 
@@ -134,17 +137,28 @@ export default class MarketPlaceScreen extends React.Component {
   }
 
   async renderMyData() {
-    var url = new URL("http://167.172.245.215/products");
-    var params = [
-      ["q[price_gteq]", this.state.minvalue],
-      ["q[price_lteq]", this.state.maxvalue]
-    ];
+    var url = `http://167.172.245.215/products?q[category_id]=${this.state.categoryid}&q[min_price]=${this.state.minvalue}&q[max_price]=${this.state.maxvalue}`;
 
-    url.search = new URLSearchParams(params).toString();
-    let token = await AsyncStorage.getItem("userToken");
-    let uid = await AsyncStorage.getItem("uid");
-    let cid = await AsyncStorage.getItem("client");
-    console.log(token, uid, cid);
+    url = url.substring(0, url.length - 1);
+
+    // url.searchParams.append(data);
+
+    // var params = [
+    //   {
+    //     q: {
+    //       min_price: this.state.minvalue,
+    //       max_price: this.state.maxvalue
+    //     }
+    //     // ["q[min_price]", this.state.minvalue],
+    //     // ["q[max_price]", this.state.maxvalue]
+    //   }
+    // ];
+    // Object.keys(params).forEach(key =>
+    //   url.searchParams.append(key, params[key])
+    // );
+
+    // url.search = new URLSearchParams(data).toString();
+    console.log("url", url);
     fetch(url, {
       method: "GET",
       headers: {
@@ -191,8 +205,6 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        console.log(responseJson);
-
         // this.setState({ name : responseJson["name"] })
         // this.setState({ email : responseJson["email"] })
         this.setState({
@@ -200,6 +212,33 @@ export default class MarketPlaceScreen extends React.Component {
           backup_data_group: responseJson
         });
         // console.log(responseJson[0]['images'])
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  async get_categories_data() {
+    var url = new URL("http://167.172.245.215/products/categories");
+
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "access-token": await AsyncStorage.getItem("userToken"),
+        uid: await AsyncStorage.getItem("uid"),
+        client: await AsyncStorage.getItem("client")
+      }
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        let catData = [];
+        responseJson.categories.map(cat => {
+          catData.push({ value: cat.name, id: cat.id });
+        });
+        this.setState({
+          categorydata: catData
+        });
       })
       .catch(error => {
         console.log(error);
@@ -221,7 +260,7 @@ export default class MarketPlaceScreen extends React.Component {
   send_enquiry = () => {
     this.setModalVisible(!this.state.modalVisible);
     Alert.alert(
-      "Sorry!! Your request cannot bbe processed right now. Please try again later"
+      "Sorry!! Your request cannot be processed right now. Please try again later"
     );
   };
 
@@ -229,6 +268,7 @@ export default class MarketPlaceScreen extends React.Component {
     this.setState({ filtermodalVisible: !this.state.filtermodalVisible });
     data = this.state.backup_data;
     data_group = this.state.backup_data_group;
+    this.renderMyData();
 
     data = data.filter(l => {
       return (
@@ -299,126 +339,18 @@ export default class MarketPlaceScreen extends React.Component {
       });
   };
 
+  onDropdownChanege = (vall, ind) => {
+    let data = this.state.categorydata;
+    let selectedid = "";
+    data.map(val => {
+      if (val.value === vall) {
+        selectedid = val.id;
+      }
+    });
+    this.setState({ category: vall, categoryid: selectedid });
+  };
+
   render() {
-    let group_items = [
-      {
-        id: "1",
-        title: "2",
-        price: "32",
-        description: "csxcsdc",
-        products: [
-          {
-            id: "1",
-            title: "abc",
-            price: "123",
-            category: "xss",
-            need_uninstallation: "",
-            location: "v",
-            appraised_value: "2",
-            description: "abc",
-            width: "2",
-            height: "2",
-            depth: "2",
-            weight: "2",
-            uom: "",
-            serial: "2323",
-            images: []
-          }
-        ]
-      }
-    ];
-
-    let data = [
-      {
-        id: "1",
-        title: "abc",
-        price: "123",
-        category: "xss",
-        need_uninstallation: "",
-        location: "v",
-        appraised_value: "2",
-        description: "abc",
-        width: "2",
-        height: "2",
-        depth: "2",
-        weight: "2",
-        uom: "",
-        serial: "2323",
-        images: []
-      },
-      {
-        id: "2",
-        title: "abc",
-        price: "123",
-        category: "xss",
-        need_uninstallation: "",
-        location: "v",
-        appraised_value: "2",
-        description: "abc",
-        width: "2",
-        height: "2",
-        depth: "2",
-        weight: "2",
-        uom: "",
-        serial: "2323",
-        images: []
-      },
-      {
-        id: "3",
-        title: "abc",
-        price: "123",
-        category: "xss",
-        need_uninstallation: "",
-        location: "v",
-        appraised_value: "2",
-        description: "abc",
-        width: "2",
-        height: "2",
-        depth: "2",
-        weight: "2",
-        uom: "",
-        serial: "2323",
-        images: []
-      },
-      {
-        id: "4",
-        title: "abc",
-        price: "123",
-        category: "xss",
-        need_uninstallation: "",
-        location: "v",
-        appraised_value: "2",
-        description: "abc",
-        width: "2",
-        height: "2",
-        depth: "2",
-        weight: "2",
-        uom: "",
-        serial: "2323",
-        images: []
-      },
-      {
-        id: "5",
-        title: "abc",
-        price: "123",
-        category: "xss",
-        need_uninstallation: "",
-        location: "v",
-        appraised_value: "2",
-        description: "abc",
-        width: "2",
-        height: "2",
-        depth: "2",
-        weight: "2",
-        uom: "",
-        serial: "2323",
-        images: []
-      }
-    ];
-    {
-      console.log("dsssssss", this.state.group_items);
-    }
-
     return (
       <View style={styles.container}>
         <Modal
@@ -522,24 +454,22 @@ export default class MarketPlaceScreen extends React.Component {
               <View style={styles.inputContainer}>
                 <Text>Minimum Price: ${this.state.minvalue}</Text>
                 <Slider
-                  value={this.state.value}
+                  value={this.state.minvalue}
                   onValueChange={value => this.setState({ minvalue: value })}
-                  maximumValue={0}
+                  maximumValue={100000}
                   thumbTintColor="#5EA64A"
                   step={1}
-                  value={0}
                 />
               </View>
 
               <View style={styles.inputContainer}>
                 <Text>Maximum Price: ${this.state.maxvalue}</Text>
                 <Slider
-                  value={this.state.value}
+                  value={this.state.maxvalue}
                   onValueChange={value => this.setState({ maxvalue: value })}
                   maximumValue={100000}
                   thumbTintColor="#5EA64A"
                   step={1}
-                  value={100000}
                 />
               </View>
               <View style={styles.inputContainer}>
@@ -560,7 +490,9 @@ export default class MarketPlaceScreen extends React.Component {
                     marginLeft: 5
                   }}
                   value={this.state.category}
-                  onChangeText={value => this.setState({ category: value })}
+                  onChangeText={(value, index, data) =>
+                    this.onDropdownChanege(value, index, data)
+                  }
                   data={this.state.categorydata}
                 />
               </View>
