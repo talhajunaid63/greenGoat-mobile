@@ -30,6 +30,7 @@ import {
 } from "react-native-credit-card-input";
 import ImageSlider from "react-native-image-slider";
 import back from "../assets/images/back.png";
+import {BASE_URL} from "../config/NetworkConstants";
 
 export default class WishListScreen extends React.Component {
   constructor(props) {
@@ -72,16 +73,15 @@ export default class WishListScreen extends React.Component {
   componentDidMount() {
     const { navigation } = this.props;
     this.focusListener = navigation.addListener("didFocus", () => {
-      this.renderMyData();
+
     });
+      this.renderMyData();
   }
 
-  componentWillMount() {
-    this.renderMyData();
-  }
+
 
   async renderMyData() {
-    fetch("http://167.172.245.215/wishlists", {
+    fetch(BASE_URL+"favourites", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -92,6 +92,7 @@ export default class WishListScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
+          console.log("Favourites:",responseJson);
         this.setState(
           {
             data: responseJson["products"],
@@ -100,7 +101,7 @@ export default class WishListScreen extends React.Component {
             progress: true
           },
           () => {
-            console.log(this.state.data);
+
           }
         );
       })
@@ -128,7 +129,7 @@ export default class WishListScreen extends React.Component {
   };
 
   remove_from_wishlist = async product_id => {
-    fetch("http://167.172.245.215/wishlists/remove-from-wishlist", {
+    fetch(BASE_URL+"favourites/remove-from-favourite", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -143,7 +144,7 @@ export default class WishListScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        console.log(responseJson);
+
         this.renderMyData();
         Alert.alert("Product removed from wish list");
       })
@@ -152,6 +153,7 @@ export default class WishListScreen extends React.Component {
         console.log(error);
       });
   };
+
   addMore = () => {
     this.setState({ addMoreModalVisible: true });
   };
@@ -174,7 +176,7 @@ export default class WishListScreen extends React.Component {
             />
           }
           centerComponent={{
-            text: "Wish list",
+            text: "Favourite",
             style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
           }}
         />
@@ -191,11 +193,11 @@ export default class WishListScreen extends React.Component {
               onPress={() => this.props.navigation.openDrawer()}
             />
           }
-          rightComponent={
-            <Icon name="add" color="#fff" onPress={() => this.addMore()} />
-          }
+          // rightComponent={
+          //   <Icon name="add" color="#fff" onPress={() => this.addMore()} />
+          // }
           centerComponent={{
-            text: this.props.navigation.state.routeName,
+            text: "Favourite",
             style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
           }}
         />
@@ -243,7 +245,7 @@ export default class WishListScreen extends React.Component {
                   marginLeft: -15
                 }}
               >
-                Add To Wishlist
+                Add To Favourite
               </Text>
               <View>
                 <Text></Text>
@@ -367,6 +369,15 @@ export default class WishListScreen extends React.Component {
           keyExtractor={item => {
             return item.id;
           }}
+          ListEmptyComponent={() => {
+              return( <View style={styles.separator} >
+                      <Text style={{fontSize:20, fontWeight:"bold", paddingHorizontal:20, marginTop:20}}>
+                          There are no favourite items
+                      </Text>
+                  </View>
+              )
+
+          }}
           ItemSeparatorComponent={() => {
             return <View style={styles.separator} />;
           }}
@@ -465,7 +476,7 @@ export default class WishListScreen extends React.Component {
                         type="ionicon"
                       />
                     }
-                    title="Remove from Wish list"
+                    title="Remove from Favourite"
                   />
                 </View>
               </View>

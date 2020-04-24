@@ -32,6 +32,7 @@ import { Tab, Tabs, TabHeading } from "native-base";
 import filterr from "../assets/images/filterr.png";
 import back from "../assets/images/back.png";
 import { Dropdown } from "react-native-material-dropdown";
+import {BASE_URL} from "../config/NetworkConstants";
 
 // import MultiSlider from "@ptomasroos/react-native-multi-slider";
 export default class MarketPlaceScreen extends React.Component {
@@ -94,7 +95,7 @@ export default class MarketPlaceScreen extends React.Component {
       category: "Electronics",
       installation: "Yes",
       progress: true,
-      categoryid: 1,
+      categoryid: -1,
       categorydata: [
         {
           value: "Electronics"
@@ -137,9 +138,23 @@ export default class MarketPlaceScreen extends React.Component {
   }
 
   async renderMyData() {
-    var url = `http://167.172.245.215/products?q[category_id]=${this.state.categoryid}&q[min_price]=${this.state.minvalue}&q[max_price]=${this.state.maxvalue}`;
+    if(this.state.categoryid!==-1 && this.state.maxvalue!=-1) {
+      var url = BASE_URL + `products?q[category_id]=${this.state.categoryid}&q[min_price]=${this.state.minvalue}&q[max_price]=${this.state.maxvalue}`;
+    }
+    else if(this.state.categoryid!=-1){
+      var url = BASE_URL + `products?q[category_id]=${this.state.categoryid}`;
 
-    url = url.substring(0, url.length - 1);
+    }
+    else if(this.state.maxvalue!=-1){
+      var url = BASE_URL + `products?q[min_price]=${this.state.minvalue}&q[max_price]=${this.state.maxvalue}`;
+
+    }
+    else {
+      var url = BASE_URL + "products";
+
+    }
+  console.log("Url before:",url);
+//    url = url.substring(0, url.length - 1);
 
     // url.searchParams.append(data);
 
@@ -171,6 +186,7 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
+        console.log("ResponseJson:",responseJson);
         // this.setState({ name : responseJson["name"] })
         // this.setState({ email : responseJson["email"] })
         this.get_group_items();
@@ -186,7 +202,7 @@ export default class MarketPlaceScreen extends React.Component {
   }
 
   async get_group_items() {
-    var url = new URL("http://167.172.245.215/group_items");
+    var url = new URL(BASE_URL+"group_items");
     var params = [
       ["q[price_gteq]", this.state.minvalue],
       ["q[price_lteq]", this.state.maxvalue]
@@ -219,7 +235,7 @@ export default class MarketPlaceScreen extends React.Component {
   }
 
   async get_categories_data() {
-    var url = new URL("http://167.172.245.215/products/categories");
+    var url = new URL(BASE_URL+"/products/categories");
 
     fetch(url, {
       method: "GET",
@@ -232,6 +248,7 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
+        console.log("Products Categories Response:",responseJson);
         let catData = [];
         responseJson.categories.map(cat => {
           catData.push({ value: cat.name, id: cat.id });
@@ -268,6 +285,9 @@ export default class MarketPlaceScreen extends React.Component {
     this.setState({ filtermodalVisible: !this.state.filtermodalVisible });
     data = this.state.backup_data;
     data_group = this.state.backup_data_group;
+    if(this.state.categoryid===-1){
+      this.state.categoryid=1;
+    }
     this.renderMyData();
 
     data = data.filter(l => {
@@ -314,7 +334,7 @@ export default class MarketPlaceScreen extends React.Component {
   };
 
   add_to_wishlist = async item => {
-    fetch("http://167.172.245.215/wishlists/add-to-wishlist", {
+    fetch(BASE_URL+"favourites/add-to-favourite", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -331,7 +351,7 @@ export default class MarketPlaceScreen extends React.Component {
       .then(response => response.json())
       .then(responseJson => {
         console.log(responseJson);
-        Alert.alert("Product added to wish list");
+        Alert.alert("Product added to favourite list");
       })
 
       .catch(error => {
@@ -467,7 +487,7 @@ export default class MarketPlaceScreen extends React.Component {
                 <Slider
                   value={this.state.maxvalue}
                   onValueChange={value => this.setState({ maxvalue: value })}
-                  maximumValue={100000}
+                  maximumValue={10000}
                   thumbTintColor="#5EA64A"
                   step={1}
                 />
@@ -499,7 +519,7 @@ export default class MarketPlaceScreen extends React.Component {
               <View style={styles.inputContainer}>
                 <Text>Installation Required?</Text>
                 <Dropdown
-                  label="Category"
+                  label=""
                   itemColor={"white"}
                   selectedItemColor={"white"}
                   containerStyle={{
@@ -527,7 +547,7 @@ export default class MarketPlaceScreen extends React.Component {
                       onValueChange={(itemValue, itemIndex) =>
                         this.setState({value: itemValue})
                       }>
-                      <Picker.Item label="Newest" value="new" />  
+                      <Picker.Item label="Newest" value="new" />
                       <Picker.Item label="Price low to high" value="lth" />
                       <Picker.Item label="Price high to low" value="htl" />
                     </Picker>
@@ -684,7 +704,7 @@ export default class MarketPlaceScreen extends React.Component {
                           </View>
                         </View>
                         <Button
-                          title="Add to Wishlist"
+                          title="Add to Favourite"
                           type="outline"
                           onPress={() => {
                             item.id !== "" ? this.add_to_wishlist(item) : "";
@@ -828,7 +848,7 @@ export default class MarketPlaceScreen extends React.Component {
                           </View>
                         </View>
                         <Button
-                          title="Add to Wishlist"
+                          title="Add to Favourite"
                           type="outline"
                           onPress={() => {
                             item.id !== "" ? this.add_to_wishlist(item) : "";

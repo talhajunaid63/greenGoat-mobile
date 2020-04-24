@@ -22,6 +22,7 @@ import {
   Thumbnail
 } from "native-base";
 import { withNavigationFocus } from "react-navigation";
+import {BASE_URL} from "../config/NetworkConstants";
 
 export default class ActivityScreen extends React.Component {
   constructor(props) {
@@ -49,7 +50,7 @@ export default class ActivityScreen extends React.Component {
   }
 
   async renderMyData() {
-    fetch("http://167.172.245.215/myactivity", {
+    fetch(BASE_URL+"myactivity", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

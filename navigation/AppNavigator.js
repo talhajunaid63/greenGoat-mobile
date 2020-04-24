@@ -5,6 +5,7 @@ import { createStackNavigator } from "react-navigation-stack";
 import {
   createDrawerNavigator,
   DrawerNavigatorItems,
+
   DrawerItems
 } from "react-navigation-drawer";
 import {
@@ -15,7 +16,9 @@ import {
   ImageBackground,
   ActivityIndicator,
   AsyncStorage,
-  SafeAreaView
+  SafeAreaView,
+    TouchableOpacity,
+
 } from "react-native";
 import { Button, Input } from "react-native-elements";
 import { getStatusBarHeight } from "react-native-status-bar-height";
@@ -25,6 +28,7 @@ import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import WishListScreen from "../screens/WishListScreen";
+import RequestItemScreen from "../screens/RequestItemScreen";
 import AboutUsScreen from "../screens/AboutUsScreen";
 import ContactUsScreen from "../screens/ContactUsScreen";
 import SettingsScreen from "../screens/SettingsScreen";
@@ -41,6 +45,7 @@ import {
   Icon,
   Thumbnail
 } from "native-base";
+import {BASE_URL} from "../config/NetworkConstants";
 
 class GetStartedScreen extends React.Component {
   componentWillMount() {
@@ -83,9 +88,39 @@ class GetStartedScreen extends React.Component {
 }
 
 class AuthLoadingScreen extends React.Component {
+  state={
+    firstName:"",
+    lastName:"",
+  }
   constructor() {
     super();
     this._bootstrapAsync();
+
+
+  }
+
+  async renderMyData() {
+    fetch(BASE_URL+"myprofile", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "access-token": await AsyncStorage.getItem("userToken"),
+        uid: await AsyncStorage.getItem("uid"),
+        client: await AsyncStorage.getItem("client")
+      }
+    })
+        .then(response => response.json())
+        .then(responseJson => {
+          console.log("ResponseJson:",responseJson);
+          this.setState({ firstname: responseJson["firstname"],lastname: responseJson["lastname"] });
+
+        })
+        .catch(error => {
+          console.error(error);
+        });
+  }
+  componentDidMount() {
+    this.renderMyData();
   }
 
   // Fetch the token from storage then navigate to our appropriate place
@@ -133,16 +168,28 @@ DashboardStackNavigator.navigationOptions = {
   drawerIcon: ({ tintColor }) => <Icon name="home" type="FontAwesome" />
 };
 
-const CustomDrawer = props => (
+const CustomDrawer = props =>
+
+    (
   <Container>
     <Header style={{ height: 200, backgroundColor: "#089D37" }}>
       <Body style={styles.drawer_header}>
         <Thumbnail large source={require("../assets/images/logo-half.png")} />
-        <Text style={{ color: "white", paddingTop: 10 }}>John Doe</Text>
+         {/*<Text style={{ color: "white", paddingTop: 10 }}>{this.state.firstname}</Text>*/}
       </Body>
     </Header>
     <Content>
       <DrawerNavigatorItems {...props} />
+      <TouchableOpacity
+          onPress={() => {
+            AsyncStorage.clear();
+            props.navigation.navigate("Auth");
+          }}
+          style={{flexDirection:"row", alignItems:"center"}}>
+        <Icon name="md-settings" type="ionicon" style={{ fontSize: 25,marginStart:18,marginEnd:32, }} />
+        <Text style={{color:"black", fontWeight:"bold"}}> Logout</Text>
+      </TouchableOpacity>
+
     </Content>
   </Container>
 );
@@ -155,7 +202,7 @@ const AppDrawerNavigator = createDrawerNavigator(
     Profile: {
       screen: ProfileScreen
     },
-    Wishlist: {
+    Favourite: {
       screen: WishListScreen
     },
     AboutUs: {
@@ -169,7 +216,10 @@ const AppDrawerNavigator = createDrawerNavigator(
     },
     PrivacyPolicy: {
       screen: PrivacyPolicyScreen
-    }
+    },
+    Wishlist: {
+      screen: RequestItemScreen
+    },
   },
   {
     initialRouteName: "Home",

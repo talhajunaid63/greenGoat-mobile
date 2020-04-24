@@ -1,24 +1,25 @@
 import React from "react";
 import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  AsyncStorage,
-  Alert,
-  Modal,
-  TouchableHighlight,
-  Picker,
-  ScrollView,
-  ActivityIndicator
+    StyleSheet,
+    Text,
+    View,
+    Image,
+    TouchableOpacity,
+    AsyncStorage,
+    Alert,
+    Modal,
+    TouchableHighlight,
+    Picker,
+    ScrollView,
+    ActivityIndicator, Linking
 } from "react-native";
 import UserAvatar from "react-native-user-avatar";
-import { Avatar, Input, Button } from "react-native-elements";
+import {Avatar, Input, Button, Header} from "react-native-elements";
 import DatePicker from "react-native-datepicker";
 
 import { Icon } from "native-base";
 import back from "../assets/images/back.png";
+import {BASE_URL} from "../config/NetworkConstants";
 
 export default class ProfileScreen extends React.Component {
   constructor(props) {
@@ -60,7 +61,7 @@ export default class ProfileScreen extends React.Component {
   }
 
   async renderMyData() {
-    fetch("http://167.172.245.215/myprofile", {
+    fetch(BASE_URL+"myprofile", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -71,6 +72,7 @@ export default class ProfileScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
+          console.log("ResponseJson:",responseJson);
         this.setState({ progress: true });
         this.setState({ firstname: responseJson["firstname"] });
         this.setState({ lastname: responseJson["lastname"] });
@@ -82,6 +84,7 @@ export default class ProfileScreen extends React.Component {
         this.setState({ state: responseJson["state"] });
         this.setState({ zip: responseJson["zip"] });
         this.setState({ dob: responseJson["dob"] });
+          this.setState({ phone_type: responseJson["phone_type"] });
         this.setState({ phone: responseJson["phone"].toString() });
       })
       .catch(error => {
@@ -90,7 +93,7 @@ export default class ProfileScreen extends React.Component {
   }
 
   update_user = async () => {
-    fetch("http://167.172.245.215/auth", {
+    fetch(BASE_URL+"auth", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -115,8 +118,8 @@ export default class ProfileScreen extends React.Component {
       .then(responseJson => {
         console.log(responseJson);
         if (responseJson["status"] == "success") {
-          Alert.alert("User updated");
-          this.setState({ modalVisible: false });
+          this.setState({ modalVisible: false },()=>{
+            });
           this.renderMyData();
         } else {
           Alert.alert(responseJson["errors"].full_messages[0]);
@@ -129,7 +132,7 @@ export default class ProfileScreen extends React.Component {
   };
 
   update_password = async () => {
-    fetch("http://167.172.245.215/auth/password", {
+    fetch(BASE_URL+"auth/password", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -163,7 +166,7 @@ export default class ProfileScreen extends React.Component {
         <Avatar
           rounded
           size="xlarge"
-          source={{ uri: "http://167.172.245.215/" + this.state.image }}
+          source={{ uri: BASE_URL + this.state.image }}
         />
       );
     } else {
@@ -172,6 +175,9 @@ export default class ProfileScreen extends React.Component {
     }
   }
 
+    updatePhoneType(type){
+      this.setState({phone_type:type})
+    }
   render() {
     if (this.state.progress == false) {
       return (
@@ -188,49 +194,67 @@ export default class ProfileScreen extends React.Component {
           visible={this.state.modalVisible}
           onRequestClose={() => {}}
         >
-          <View
-            style={{
-              width: "100%",
-              height: 70,
-              backgroundColor: "#089D37",
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingHorizontal: 20,
-              paddingTop: 20,
-              display: "flex",
-              flexDirection: "row"
-            }}
-          >
-            {/* <Icon
-                style={{ paddingLeft: 20 }}
-                onPress={() => navigation.goBack()}
-                name="left"
-                color="#FFF"
-                size={30}
-              /> */}
-            <TouchableOpacity
-              onPress={() => {
-                this.setState({ modalVisible: false });
-              }}
-              style={{ width: 25, height: 25 }}
-            >
-              <Image source={back} style={{ width: 25, height: 25 }}></Image>
-            </TouchableOpacity>
-            <Text
-              style={{
-                fontWeight: "700",
-                textAlign: "center",
-                color: "white",
-                fontSize: 22,
-                marginLeft: -15
-              }}
-            >
-              Update Profile{" "}
-            </Text>
-            <View>
-              <Text></Text>
-            </View>
-          </View>
+            <Header
+                backgroundColor={"#089D37"}
+                leftComponent={
+                    <TouchableOpacity
+                        onPress={() => {
+                            this.setState({ modalVisible: false });
+                        }}
+                        style={{ width: 25, height: 25 }}
+                    >
+                        <Image source={back} style={{ width: 25, height: 25 }}/>
+                    </TouchableOpacity>
+                }
+
+                centerComponent={{
+                    text: "Update Profile",
+                    style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
+                }}
+            />
+          {/*<View*/}
+          {/*  style={{*/}
+          {/*    width: "100%",*/}
+          {/*    height: 70,*/}
+          {/*    backgroundColor: "#089D37",*/}
+          {/*    justifyContent: "space-between",*/}
+          {/*    alignItems: "center",*/}
+          {/*    paddingHorizontal: 20,*/}
+          {/*    paddingTop: 20,*/}
+          {/*    display: "flex",*/}
+          {/*    flexDirection: "row"*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  /!* <Icon*/}
+          {/*      style={{ paddingLeft: 20 }}*/}
+          {/*      onPress={() => navigation.goBack()}*/}
+          {/*      name="left"*/}
+          {/*      color="#FFF"*/}
+          {/*      size={30}*/}
+          {/*    /> *!/*/}
+          {/*  <TouchableOpacity*/}
+          {/*    onPress={() => {*/}
+          {/*      this.setState({ modalVisible: false });*/}
+          {/*    }}*/}
+          {/*    style={{ width: 25, height: 25 }}*/}
+          {/*  >*/}
+          {/*    <Image source={back} style={{ width: 25, height: 25 }}></Image>*/}
+          {/*  </TouchableOpacity>*/}
+          {/*  <Text*/}
+          {/*    style={{*/}
+          {/*      fontWeight: "700",*/}
+          {/*      textAlign: "center",*/}
+          {/*      color: "white",*/}
+          {/*      fontSize: 22,*/}
+          {/*      marginLeft: -15*/}
+          {/*    }}*/}
+          {/*  >*/}
+          {/*    Update Profile{" "}*/}
+          {/*  </Text>*/}
+          {/*  <View>*/}
+          {/*    <Text></Text>*/}
+          {/*  </View>*/}
+          {/*</View>*/}
           <ScrollView style={{ paddingVertical: 30 }}>
             <View style={styles.inputContainer}>
               <Input
@@ -249,7 +273,7 @@ export default class ProfileScreen extends React.Component {
               />
             </View>
 
-            <View style={styles.inputContainer}>
+            <View style={[styles.inputContainer,{marginBottom:20}]}>
               <Input
                 placeholder="Last Name"
                 placeholderTextColor="#7777775c"
@@ -266,13 +290,31 @@ export default class ProfileScreen extends React.Component {
               />
             </View>
 
+              <View style={styles.phone_outer_container_style}>
+                  <TouchableOpacity
+                      onPress={this.updatePhoneType.bind(this,"cell")}
+                      style={styles.phone_container_style}>
+                      <View style={[styles.radio_style,{backgroundColor:this.state.phone_type==="cell"?"#089D37":"white"}]}/>
+                      <Text style={styles.phone_label_style}>
+                          {'Cellphone'}
+                      </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                      onPress={this.updatePhoneType.bind(this,"landline")}
+                      style={styles.phone_container_style}>
+                      <View style={[styles.radio_style,{backgroundColor:this.state.phone_type==="landline"?"#089D37":"white"}]}/>
+                      <Text style={styles.phone_label_style}>
+                          {'Landline'}
+                      </Text>
+                  </TouchableOpacity>
+              </View>
             <View style={styles.inputContainer}>
               <Input
                 placeholder="Phone"
                 placeholderTextColor="#7777775c"
                 leftIcon={{
                   type: "font-awesome",
-                  name: "user",
+                  name: "phone",
                   color: "#5EA64A"
                 }}
                 style={styles.input_style}
@@ -283,19 +325,19 @@ export default class ProfileScreen extends React.Component {
               />
             </View>
 
-            <View style={styles.typeContainer}>
-              <Picker
-                style={{ height: 50, width: 200 }}
-                prompt="Phone type"
-                selectedValue={this.state.phone_type}
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({ phone_type: itemValue })
-                }
-              >
-                <Picker.Item label="Cellphone" value="cell" />
-                <Picker.Item label="Landline" value="landline" />
-              </Picker>
-            </View>
+            {/*<View style={styles.typeContainer}>*/}
+            {/*  <Picker*/}
+            {/*    style={{ height: 50, width: 200 }}*/}
+            {/*    prompt="Phone type"*/}
+            {/*    selectedValue={this.state.phone_type}*/}
+            {/*    onValueChange={(itemValue, itemIndex) =>*/}
+            {/*      this.setState({ phone_type: itemValue })*/}
+            {/*    }*/}
+            {/*  >*/}
+            {/*    <Picker.Item label="Cellphone" value="cell" />*/}
+            {/*    <Picker.Item label="Landline" value="landline" />*/}
+            {/*  </Picker>*/}
+            {/*</View>*/}
 
             <View style={styles.inputContainer}>
               <Input
@@ -303,7 +345,7 @@ export default class ProfileScreen extends React.Component {
                 placeholderTextColor="#7777775c"
                 leftIcon={{
                   type: "font-awesome",
-                  name: "user",
+                  name: "address-book",
                   color: "#5EA64A"
                 }}
                 style={styles.input_style}
@@ -320,7 +362,7 @@ export default class ProfileScreen extends React.Component {
                 placeholderTextColor="#7777775c"
                 leftIcon={{
                   type: "font-awesome",
-                  name: "user",
+                  name: "address-book",
                   color: "#5EA64A"
                 }}
                 style={styles.input_style}
@@ -337,7 +379,7 @@ export default class ProfileScreen extends React.Component {
                 placeholderTextColor="#7777775c"
                 leftIcon={{
                   type: "font-awesome",
-                  name: "user",
+                  name: "map-pin",
                   color: "#5EA64A"
                 }}
                 style={styles.input_style}
@@ -354,7 +396,7 @@ export default class ProfileScreen extends React.Component {
                 placeholderTextColor="#7777775c"
                 leftIcon={{
                   type: "font-awesome",
-                  name: "user",
+                  name: "home",
                   color: "#5EA64A"
                 }}
                 style={styles.input_style}
@@ -371,7 +413,7 @@ export default class ProfileScreen extends React.Component {
                 placeholderTextColor="#7777775c"
                 leftIcon={{
                   type: "font-awesome",
-                  name: "user",
+                  name: "pencil",
                   color: "#5EA64A"
                 }}
                 style={styles.input_style}
@@ -509,11 +551,14 @@ export default class ProfileScreen extends React.Component {
               {this.state.firstname} {this.state.lastname}
             </Text>
             <Text style={styles.info}>{this.state.email}</Text>
-            <Text style={styles.info}>
-              Address: {this.state.address1}, {this.state.address2},{" "}
+              {(this.state.address1!=null || this.state.address2!=null ) && <Text style={styles.info}>
+              Address: {this.state.address1?(this.state.address1+","):""} {this.state.address2?(this.state.address2+","):""}{" "}
               {this.state.city} {this.state.state} {this.state.zip}{" "}
-            </Text>
-            <Text style={styles.info}>DOB: {this.state.dob}</Text>
+            </Text>}
+              {(this.state.address1==null && this.state.address2==null ) && <Text style={styles.info}>
+                  Address: None
+              </Text>}
+
             <View style={{ marginTop: 30 }}>
               <TouchableHighlight
                 onPress={() => {
@@ -529,10 +574,26 @@ export default class ProfileScreen extends React.Component {
                onPress={() => {
                 this.setState({passwordModal: true});
               }}>
-                <Text>Change Password</Text>  
+                <Text>Change Password</Text>
               </TouchableOpacity>               */}
           </View>
         </View>
+          {/*<View style={styles.checkcontainer}>*/}
+          {/*    <TouchableOpacity*/}
+          {/*        onPress={()=>{this.setState({terms:!this.state.terms})}}*/}
+          {/*        style={styles.checkbox_container}>*/}
+          {/*        {this.state.terms===true && <Text>*/}
+          {/*            {'✓'}*/}
+          {/*        </Text>}*/}
+          {/*    </TouchableOpacity>*/}
+
+          {/*    <Text*/}
+          {/*        style={{ color: "#5EA64A", textDecorationLine: "underline" }}*/}
+          {/*        onPress={() => Linking.openURL("https://google.com")}*/}
+          {/*    >*/}
+          {/*        Enable Email Updates*/}
+          {/*    </Text>*/}
+          {/*</View>*/}
       </ScrollView>
     );
   }
@@ -597,6 +658,28 @@ const styles = StyleSheet.create({
     color: "#00BFFF",
     marginTop: 10
   },
+    phone_container_style:{
+    flexDirection:"row",
+    alignItems:"center",
+    },
+    phone_outer_container_style:{
+      flexDirection:"row",
+        justifyContent: "space-around",
+        marginBottom:10,
+    },
+    radio_style:{
+      borderRadius:25,
+        height:25,
+        width:25,
+        borderWidth:2,
+        borderColor:"#089D37"
+    },
+    phone_label_style:{
+        fontSize: 16,
+        marginStart:10,
+        color: "black",
+    },
+
   description: {
     fontSize: 16,
     color: "#696969",
@@ -627,5 +710,12 @@ const styles = StyleSheet.create({
     marginBottom: 120,
     flexDirection: "row",
     alignItems: "center"
-  }
+  },
+    checkContainer:{
+      position:"absolute",
+        bottom:30,
+        justifyContent:"center",
+        alignItems:"center",
+        width:"100%",
+    }
 });

@@ -15,6 +15,7 @@ import {
   Picker,
   CheckBox
 } from "react-native";
+import {BASE_URL} from "../config/NetworkConstants";
 import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import { Button } from "react-native-elements";
@@ -141,6 +142,10 @@ export default class SignUpScreen extends React.Component {
       this.setState({ image_base64: result.base64 });
     }
   };
+  updateTerms(){
+
+    this.setState({terms:!this.state.terms})
+  }
 
   componentDidMount() {
     this.getPermissionAsync();
@@ -155,11 +160,6 @@ export default class SignUpScreen extends React.Component {
     }
   };
 
-  handleCheckbox = val => {
-    this.setState({
-      terms: val
-    });
-  };
 
   render() {
     const { navigate } = this.props.navigation;
@@ -347,6 +347,7 @@ export default class SignUpScreen extends React.Component {
                 }}
               >
                 <Image
+                    resizeMode={"contain"}
                   source={this.state.phone_type === "Cellphone" ? phone : land}
                   style={{ width: "20%", height: 22 }}
                 />
@@ -389,12 +390,14 @@ export default class SignUpScreen extends React.Component {
             </View>
 
             <View style={styles.checkcontainer}>
-              <CheckBox
-                value={this.state.terms}
-                onValueChange={val => {
-                  this.handleCheckbox(val);
-                }}
-              />
+              <TouchableOpacity
+                  onPress={this.updateTerms.bind(this)}
+                  style={styles.checkbox_container}>
+                {this.state.terms===true && <Text>
+                  {'✓'}
+                </Text>}
+              </TouchableOpacity>
+
               <Text
                 style={{ color: "#5EA64A", textDecorationLine: "underline" }}
                 onPress={() => Linking.openURL("https://google.com")}
@@ -428,7 +431,7 @@ export default class SignUpScreen extends React.Component {
           message={this.state.errormessage}
           closeOnTouchOutside={false}
           closeOnHardwareBackPress={true}
-          showCancelButton={true}
+          showCancelButton={this.state.errortitle!=="Loading"}
           showConfirmButton={false}
           cancelText="Ok"
           confirmText=""
@@ -449,7 +452,7 @@ export default class SignUpScreen extends React.Component {
       this.setState({ errormessage: "In progress...." });
       this.setState({ errortitle: "Loading" });
       this.showAlert();
-      fetch("http://167.172.245.215/api/auth/", {
+      fetch(BASE_URL+"/api/auth/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -471,7 +474,7 @@ export default class SignUpScreen extends React.Component {
       })
         .then(response => response.json())
         .then(responseJson => {
-          console.log(responseJson);
+          console.log("Response::",responseJson);
           if (responseJson["status"] == "success") {
             // this.hideAlert();
             this.setState({
@@ -495,6 +498,10 @@ export default class SignUpScreen extends React.Component {
         .catch(error => {
           console.error(error);
         });
+    }
+    else{
+      this.setState({ errormessage: "Kindly accept terms and conditions",errortitle: "Alert",      showAlert: true  });
+
     }
   };
 }
@@ -524,7 +531,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginVertical: 20
   },
-
+  checkbox_container:{
+  height:20,
+  width:20,
+  borderWidth:1,
+    borderColor:"#5EA64A",
+    marginEnd:10,
+    justifyContent:'center',
+    alignItems:'center',
+  },
   home_image: {
     alignItems: "center",
     marginTop: 100,

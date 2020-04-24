@@ -20,6 +20,7 @@ import {
   LiteCreditCardInput
 } from "react-native-credit-card-input";
 import ImageSlider from "react-native-image-slider";
+import {BASE_URL} from "../config/NetworkConstants";
 
 export default class GroupItemDetailScreen extends React.Component {
   constructor(props) {
@@ -71,7 +72,7 @@ export default class GroupItemDetailScreen extends React.Component {
 
   send_enquiry = async () => {
     // Alert.alert('Sorry!! Your request cannot bbe processed right now. Please try again later')
-    fetch("http://167.172.245.215/checkout", {
+    fetch(BASE_URL+"checkout", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -105,7 +106,7 @@ export default class GroupItemDetailScreen extends React.Component {
 
   add_to_wishlist = async () => {
     const item = this.props.navigation.state.params.item;
-    fetch("http://167.172.245.215/wishlists/add-to-wishlist", {
+    fetch(BASE_URL+"wishlists/add-to-wishlist", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

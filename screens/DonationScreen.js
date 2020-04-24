@@ -21,6 +21,8 @@ import * as Permissions from "expo-permissions";
 import AnimatedMultistep from "react-native-animated-multistep";
 import AwesomeAlert from "react-native-awesome-alerts";
 import Select2 from "react-native-select-two";
+import {BASE_URL} from "../config/NetworkConstants";
+import { NavigationActions, StackActions } from 'react-navigation'
 var city_names = [
   "Aberdeen",
   "Abilene",
@@ -482,8 +484,8 @@ for (var i = 0; i < arrayLength_state; i++) {
 }
 
 const typeData = [
-  { id: "gut", name: "Gut Reno" },
-  { id: "full", name: "Complete Demo" }, // set default checked for render option item
+  { id: "gut", name: "Gut Renovation" },
+  { id: "full", name: "Complete Demolition" }, // set default checked for render option item
   { id: "kitchen", name: "Kitchen/Bath Renovation" },
   { id: "other", name: "Other" }
 ];
@@ -546,6 +548,7 @@ class step1 extends Component {
   }
 
   nextStep = () => {
+    console.log("Calling next step");
     console.log(this.state.address);
     if (this.state.address) {
       this.setState({ error: false });
@@ -572,7 +575,7 @@ class step1 extends Component {
       <View>
         <Text style={styles.donation_form_title}>
           {" "}
-          Please enter your address to see your donation's worth{" "}
+          Please enter your project's address {" "}
         </Text>
         <View style={{ marginTop: 20 }}>
           <Input
@@ -658,6 +661,7 @@ export class step2 extends Component {
     // // var errorDiv = container.find("div.text-error");
     // var clientKey =
     //   "js-9qZHzu2Flc59Eq5rx10JdKERovBlJp3TQ3ApyC4TOa3tA8U7aVRnFwf41RpLgtE7";
+    console.log("This.state.zip:",this.state.zip);
     var url = `http://ctp-zip-api.herokuapp.com/zip/${this.state.zip}`;
     // fetch(url, {
     //   method: "GET"
@@ -671,7 +675,7 @@ export class step2 extends Component {
     fetch(url)
       .then(response => response.json())
       .then(data => {
-        console.log(data[0]);
+        console.log("Data:",data[0]);
         this.setState({
           city: data[0].City,
           state: data[0].State,
@@ -681,6 +685,7 @@ export class step2 extends Component {
         });
       })
       .catch(error => {
+        console.log("Error:",error);
         this.setState({
           iszipError: true,
           loading: false,
@@ -692,10 +697,14 @@ export class step2 extends Component {
   render() {
     return (
       <View>
-        <Text style={styles.donation_form_title}>
+        {this.state.showfeilds && !this.state.iszipError && <Text style={styles.donation_form_title}>
           {" "}
-          Please enter your Zip, City and State{" "}
-        </Text>
+          Please see the information below, proceed if correct{" "}
+        </Text>}
+        {!this.state.showfeilds && <Text style={styles.donation_form_title}>
+          {" "}
+          Please enter your Zip Code{" "}
+        </Text>}
         <View style={{ marginTop: 20 }}>
           <Input
             placeholder="Zip"
@@ -878,7 +887,7 @@ export class step3 extends Component {
                 this.setState({pickerValue: value});
                 this.setState({type_of_project:value});
               }} itemStyle={{color: 'white'}}>
-              <Picker.Item label="Gut reno" value="gut" />  
+              <Picker.Item label="Gut reno" value="gut" />
               <Picker.Item label="Full tear down" value="full" />
               <Picker.Item label="Kitchen/Bath renovation" value="kitchen" />
               <Picker.Item label="other" value="other" />
@@ -898,6 +907,7 @@ export class step3 extends Component {
             selectButtonText="Choose"
             cancelButtonText="Cancel"
             searchPlaceHolderText="Select"
+            showSearchBox={false}
             listEmptyTitle="No results found"
             selectedTitleStyle={{ color: "white" }}
             onSelect={data => {
@@ -1006,7 +1016,7 @@ export default class DonationScreen extends React.Component {
   };
 
   allSteps = [
-    { name: "step 0", component: step0 },
+
     { name: "step 1", component: step1 },
     { name: "step 2", component: step2 },
     { name: "step 3", component: step3 },
@@ -1068,7 +1078,7 @@ export default class DonationScreen extends React.Component {
       this.state.zip &&
       this.state.type
     ) {
-      fetch("http://167.172.245.215/projects/zillow-flow", {
+      fetch(BASE_URL+"projects/zillow-flow", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1139,13 +1149,23 @@ export default class DonationScreen extends React.Component {
               message={this.state.errormessage}
               closeOnTouchOutside={false}
               closeOnHardwareBackPress={true}
-              showCancelButton={false}
+              showCancelButton={this.state.errortitle==="Response"}
               showConfirmButton={false}
               cancelText="Ok"
               confirmText=""
               confirmButtonColor="#DD6B55"
               overlayStyle={{ backgroundColor: "#0000" }}
               onCancelPressed={() => {
+                this.props
+                    .navigation
+                    .dispatch(StackActions.reset({
+                      index: 0,
+                      actions: [
+                        NavigationActions.navigate({
+                          routeName: 'DashboardTabNavigator',
+                        }),
+                      ],
+                    }))
                 this.hideAlert();
               }}
               onConfirmPressed={() => {

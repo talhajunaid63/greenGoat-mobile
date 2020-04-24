@@ -19,6 +19,7 @@ import { createBottomTabNavigator } from "react-navigation-tabs";
 import { getStatusBarHeight } from "react-native-status-bar-height";
 import AwesomeAlert from "react-native-awesome-alerts";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import {BASE_URL} from "../config/NetworkConstants";
 
 export default class SignInScreen extends React.Component {
   constructor(props) {
@@ -26,7 +27,8 @@ export default class SignInScreen extends React.Component {
     this.state = {
       username: "",
       password: "",
-      showAlert: false
+      showAlert: false,
+      progress:false,
     };
   }
   static navigationOptions = {
@@ -99,6 +101,7 @@ export default class SignInScreen extends React.Component {
                 <Button
                   buttonStyle={styles.button}
                   title="Login"
+                  titleStyle={{ fontSize:28 , size:28}}
                   raised={true}
                   onPress={this.LoginApi}
                 />
@@ -144,7 +147,7 @@ export default class SignInScreen extends React.Component {
 
   LoginApi = async () => {
     var success = false;
-    fetch("http://167.172.245.215/auth/sign_in", {
+    fetch(BASE_URL+"auth/sign_in", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -222,7 +225,7 @@ const styles = StyleSheet.create({
 
   button: {
     backgroundColor: "#5EA64A",
-    width: 300
+    width: 250
   },
 
   input_style: {

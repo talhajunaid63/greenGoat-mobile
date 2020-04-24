@@ -20,6 +20,7 @@ import ReactNativeSettingsPage, {
 
 import { Icon, Header, Input, Button } from "react-native-elements";
 import back from "../assets/images/back.png";
+import {BASE_URL} from "../config/NetworkConstants";
 
 export default class SettingsScreen extends Component {
   constructor(props) {
@@ -36,7 +37,7 @@ export default class SettingsScreen extends Component {
   }
 
   update_password = async () => {
-    fetch("http://167.172.245.215/auth/password", {
+    fetch(BASE_URL+"auth/password", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -226,7 +227,7 @@ export default class SettingsScreen extends Component {
             alignItems: "center",
             width: "100%",
             flexDirection: "row",
-            justifyContent: "space-between",
+            justifyContent: "center",
             alignContent: "center",
             paddingHorizontal: 30,
             display: "flex"
@@ -240,15 +241,15 @@ export default class SettingsScreen extends Component {
           >
             <Text style={{ color: "white" }}>Change Password</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.buttonContainer}
-            onPress={() => {
-              AsyncStorage.clear();
-              this.props.navigation.navigate("Auth");
-            }}
-          >
-            <Text style={{ color: "white" }}>Logout</Text>
-          </TouchableOpacity>
+          {/*<TouchableOpacity*/}
+          {/*  style={styles.buttonContainer}*/}
+          {/*  onPress={() => {*/}
+          {/*    AsyncStorage.clear();*/}
+          {/*    this.props.navigation.navigate("Auth");*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  <Text style={{ color: "white" }}>Logout</Text>*/}
+          {/*</TouchableOpacity>*/}
 
           {/* <Button
             buttonStyle={{ backgroundColor: "#5EA64A" }}

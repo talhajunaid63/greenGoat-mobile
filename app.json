@@ -6,8 +6,7 @@
     "sdkVersion": "35.0.0",
     "platforms": [
       "ios",
-      "android",
-      "web"
+      "android"
     ],
     "version": "1.0.0",
     "orientation": "portrait",
@@ -24,10 +23,13 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.cloudevvz.greengoat",
+      "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "android": {
-      "package": "com.cloudevvz.greengoat"
+      "package": "com.cloudevvz.greengoat",
+      "versionCode": 1
     }
   }
 }

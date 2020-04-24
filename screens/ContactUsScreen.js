@@ -12,6 +12,7 @@ import {
 } from "react-native";
 
 import { Icon, Header, Input, Button } from "react-native-elements";
+import {BASE_URL} from "../config/NetworkConstants";
 
 export default class ContactUsScreen extends Component {
   constructor(props) {
@@ -27,7 +28,7 @@ export default class ContactUsScreen extends Component {
   }
 
   contactus = async () => {
-    fetch("http://167.172.245.215/contact-us", {
+    fetch(BASE_URL+"contact-us", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
