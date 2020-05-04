@@ -119,7 +119,7 @@ const DonationStack = createStackNavigator(
 
 const TabNavigator = createMaterialBottomTabNavigator(
   {
-    Donation: {
+    Home: {
       screen: DonationStack,
       navigationOptions: {
         tabBarIcon: ({ focused }) => (
@@ -154,7 +154,7 @@ const TabNavigator = createMaterialBottomTabNavigator(
     }
   },
   {
-    initialRouteName: "Donation",
+    initialRouteName: "Home",
     activeColor: "#f0edf6",
     inactiveColor: "#115e15",
     barStyle: { backgroundColor: "#5ce06e" }

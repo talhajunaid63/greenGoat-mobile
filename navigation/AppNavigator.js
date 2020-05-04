@@ -2,6 +2,7 @@ import React from "react";
 import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import MainTabNavigator from "./MainTabNavigator";
 import { createStackNavigator } from "react-navigation-stack";
+import Global from "../config/GlobalState"
 import {
   createDrawerNavigator,
   DrawerNavigatorItems,
@@ -168,14 +169,15 @@ DashboardStackNavigator.navigationOptions = {
   drawerIcon: ({ tintColor }) => <Icon name="home" type="FontAwesome" />
 };
 
-const CustomDrawer = props =>
+const CustomDrawer =  (props) =>{
 
-    (
+    return (
   <Container>
     <Header style={{ height: 200, backgroundColor: "#089D37" }}>
       <Body style={styles.drawer_header}>
         <Thumbnail large source={require("../assets/images/logo-half.png")} />
-         {/*<Text style={{ color: "white", paddingTop: 10 }}>{this.state.firstname}</Text>*/}
+          {Global.username && <Text style={{ color: "white", paddingTop: 10 }}>{Global.username}</Text>}
+
       </Body>
     </Header>
     <Content>
@@ -192,7 +194,7 @@ const CustomDrawer = props =>
 
     </Content>
   </Container>
-);
+)}
 
 const AppDrawerNavigator = createDrawerNavigator(
   {

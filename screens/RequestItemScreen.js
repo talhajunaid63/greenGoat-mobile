@@ -172,9 +172,9 @@ export default class RequestItemScreen extends React.Component {
         })
             .then(response => response.json())
             .then(responseJson => {
-                console.log("responseJson",responseJson);
-                 this.renderMyData();
                 Alert.alert("Product removed from wish list");
+                 this.renderMyData();
+
             })
 
             .catch(error => {
@@ -483,6 +483,15 @@ export default class RequestItemScreen extends React.Component {
 
                         return item.id}}
                     data={this.state.listData}
+                    ListEmptyComponent={() => {
+                        return( <View style={styles.emptyContainer} >
+                                <Text style={{fontSize:20, fontWeight:"bold", paddingHorizontal:20, marginTop:20}}>
+                                    There are no items
+                                </Text>
+                            </View>
+                        )
+
+                    }}
                     renderItem={this.renderItem}/>
 
             </View>
@@ -508,6 +517,10 @@ const styles = StyleSheet.create({
     },
     separator: {
         marginTop: 10
+    },
+    emptyContainer:{
+        justifyContent:"center",
+        alignItems:"center",
     },
     /******** card **************/
     card: {

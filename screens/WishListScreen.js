@@ -370,7 +370,7 @@ export default class WishListScreen extends React.Component {
             return item.id;
           }}
           ListEmptyComponent={() => {
-              return( <View style={styles.separator} >
+              return( <View style={styles.emptyContainer} >
                       <Text style={{fontSize:20, fontWeight:"bold", paddingHorizontal:20, marginTop:20}}>
                           There are no favourite items
                       </Text>
@@ -507,6 +507,10 @@ const styles = StyleSheet.create({
   separator: {
     marginTop: 10
   },
+    emptyContainer:{
+        justifyContent:"center",
+        alignItems:"center",
+    },
   /******** card **************/
   card: {
     shadowOffset: { width: 10, height: 10 },

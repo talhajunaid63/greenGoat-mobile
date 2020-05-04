@@ -6,6 +6,9 @@ import {
 import { Button } from 'react-native-elements';
 import { SliderBox } from "react-native-image-slider-box";
 import {BASE_URL} from "../config/NetworkConstants";
+import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
+import Global from "../config/GlobalState"
 
 export default class HomeScreen extends React.Component {
     constructor(props) {
@@ -14,11 +17,34 @@ export default class HomeScreen extends React.Component {
             images: [
 
             ],
-            progress: false,
+            progress: true,
           };
 
       }
 
+
+    getPushNotificationPermissions = async () => {
+        const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+        let finalStatus = existingStatus;
+
+        // only ask if permissions have not already been determined, because
+        // iOS won't necessarily prompt the user a second time.
+        if (existingStatus !== 'granted') {
+            // Android remote notification permissions are granted during the app
+            // install, so this will only ask on iOS
+            const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+            finalStatus = status;
+        }
+
+        // Stop here if the user did not grant permissions
+        if (finalStatus !== 'granted') {
+            return;
+        }
+        console.log(finalStatus)
+
+        // Get the token that uniquely identifies this device
+        console.log("Notification Token: ", await Notifications.getExpoPushTokenAsync());
+    }
    async remove_from_wishlist() {
 
         console.log("Token:",await AsyncStorage.getItem("userToken"));
@@ -52,13 +78,95 @@ export default class HomeScreen extends React.Component {
             });
     };
 
-    componentDidMount() {
-        this.remove_from_wishlist();
+    getPaymentDone=async (token)=>{
 
+        console.log("Token:",await AsyncStorage.getItem("userToken"));
+        console.log("UID:",await AsyncStorage.getItem("uid"));
+        console.log("client:",await AsyncStorage.getItem("uid"));
+        console.log("Base_url:",BASE_URL+"orders");
+        fetch(BASE_URL+"orders", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "access-token": await AsyncStorage.getItem("userToken"),
+                uid: await AsyncStorage.getItem("uid"),
+                client: await AsyncStorage.getItem("client")
+            },
+            body: JSON.stringify({
+                "order": {
+                    "amount": "500",
+                    "token": "tok_1GdM0TGqiv2Za2k5s79vVKxc",
+                    "order_type": "item",
+                    "id": "9"
+                }
+                }
+            )
+        })
+            .then(response => {
+                console.log("response123:",response)
+
+            console.log("response.json in payment",response.json())
+            })
+            .then(responseJson => {
+                console.log("ResponseJson payment:",responseJson);
+            })
+
+            .catch(error => {
+                console.log(error);
+            });
+    };
+
+     getCreditCardToken = () => {
+         console.log("caling:","home")
+         const card = {
+             'card[number]': "4242424242424242",
+             'card[exp_month]': "01",
+             'card[exp_year]': "23",
+             'card[cvc]': 328
+         };
+
+         let STRIPE_PUBLISHABLE_KEY='pk_test_x7BQNZlks7cWynfPFdrXSnDs'
+        return fetch('https://api.stripe.com/v1/tokens', {
+            headers: {
+                // Use the correct MIME type for your server
+                Accept: 'application/json',
+                // Use the correct Content Type to send data to Stripe
+                'Content-Type': 'application/x-www-form-urlencoded',
+                // Use the Stripe publishable key as Bearer
+                Authorization: `Bearer ${STRIPE_PUBLISHABLE_KEY}`
+            },
+            // Use a proper HTTP method
+            method: 'post',
+            // Format the credit card data to a string of key-value pairs
+            // divided by &
+            body: Object.keys(card)
+                .map(key => key + '=' + card[key])
+                .join('&')
+        }).then(response =>{
+            console.log("respons:",response)
+            console.log("in response",response.json())
+        }).catch((error=>{
+            console.log("error i  payment:",error)
+        }));
+    };
+
+     async getName(){
+         let name=await AsyncStorage.getItem("user_name")
+         console.log("Name:",name)
+         Global.username=name
+     }
+    componentDidMount() {
+        //this.remove_from_wishlist();
+        //this.getPushNotificationPermissions();
+       // let data=this.getCreditCardToken()
+        this.getPaymentDone()
+       // console.log("data:",data)
+
+            this.getName()
         }
 
     componentWillMount() {
-        this.renderMyData();
+       // this.renderMyData();
       }
 
       async renderMyData(){
@@ -68,9 +176,18 @@ export default class HomeScreen extends React.Component {
             'Content-Type': 'application/json',
           }
         })
-        .then((response) => response.json())
+        .then((response) => {
+        console.log("response before jsons:",response)
+            response.json()
+        })
         .then((responseJson) => {
-        this.setState({ images : responseJson , progress: true})
+            console.log("responseJson",responseJson)
+            if(responseJson!==null && responseJson!==undefined) {
+                this.setState({images: responseJson, progress: true})
+            }
+            else{
+                this.setState({ progress: true})
+            }
         })
         .catch((error) => {
         console.error(error);
@@ -113,6 +230,22 @@ export default class HomeScreen extends React.Component {
                     raised= {true}
                     onPress={() => this.props.navigation.navigate('Donation')}
                     />
+                    <View style={{marginVertical:10}}>
+                    <Button
+                        buttonStyle={styles.button}
+                        title= "Marketplace"
+                        titleStyle={{fontSize: 20}}
+                        raised= {true}
+                        onPress={() => this.props.navigation.navigate('MarketPlace')}
+                    />
+                    </View>
+                    <Button
+                        buttonStyle={styles.button}
+                        title= "Activities"
+                        titleStyle={{fontSize: 20}}
+                        raised= {true}
+                        onPress={() => this.props.navigation.navigate('Donation')}
+                    />
                 </View>
             </View>
         </ImageBackground>
@@ -137,6 +270,7 @@ export default class HomeScreen extends React.Component {
       button: {
         backgroundColor: '#5EA64A',
         width: 300,
+
       },
       home_slider:{
         marginTop: 150,

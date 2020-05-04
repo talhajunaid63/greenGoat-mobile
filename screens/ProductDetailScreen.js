@@ -15,6 +15,9 @@ import {
 } from "react-native";
 import { Button, Input } from "react-native-elements";
 import Icon from "@expo/vector-icons/Ionicons";
+import {
+  Icon as Icon1
+} from "react-native-elements";
 import { Table, Row, Rows } from "react-native-table-component";
 import {
   CreditCardInput,
@@ -22,12 +25,14 @@ import {
 } from "react-native-credit-card-input";
 import ImageSlider from "react-native-image-slider";
 import {BASE_URL} from "../config/NetworkConstants";
+import back from "../assets/images/back.png"
 
 export default class ProductDetailScreen extends React.Component {
   constructor(props) {
     const item = props.navigation.state.params.item;
     super(props);
     this.state = {
+      imageModal:false,
       tableData: [
         ["Dimensions", item.width + "x" + item.height],
         ["Weight", item.weight],
@@ -72,7 +77,6 @@ export default class ProductDetailScreen extends React.Component {
   setModalVisible(visible) {
     this.setState({ modalVisible: visible });
   }
-
   send_enquiry = async () => {
     // Alert.alert('Sorry!! Your request cannot bbe processed right now. Please try again later')
     fetch(BASE_URL+"checkout", {
@@ -132,15 +136,95 @@ export default class ProductDetailScreen extends React.Component {
         console.error(error);
       });
   };
+  buyNowItem(item){
+    console.log("item:",item)
+    this.selectedItem=item
+    this.setModalVisible(true)
+  }
+  getPaymentDone=async (token)=>{
 
+    console.log("Token:",await AsyncStorage.getItem("userToken"));
+    console.log("UID:",await AsyncStorage.getItem("uid"));
+    console.log("client:",await AsyncStorage.getItem("uid"));
+    console.log("Base_url:",BASE_URL+"orders");
+    fetch(BASE_URL+"orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "access-token": await AsyncStorage.getItem("userToken"),
+        uid: await AsyncStorage.getItem("uid"),
+        client: await AsyncStorage.getItem("client")
+      },
+      body: JSON.stringify({
+            "order": {
+              "amount": this.selectedItem.price,
+              "token": token,
+              "order_type": "item",
+              "id": this.selectedItem.id
+            }
+          }
+      )
+    })
+        .then(response => response.json())
+        .then(responseJson => {
+          console.log("ResponseJson payment:",responseJson);
+          if(responseJson.message){
+            Alert.alert(responseJson.message)
+          }
+
+        })
+
+        .catch(error => {
+          console.log(error);
+        });
+  };
+  getCreditCardToken = () => {
+    if(this.state.expiry!=null && this.state.number !=null) {
+      let expiry = this.state.expiry.split("/")
+
+      const card = {
+        'card[number]': this.state.number,
+        'card[exp_month]': expiry[0],
+        'card[exp_year]': expiry[1],
+        'card[cvc]': this.state.cvc
+      };
+
+      let STRIPE_PUBLISHABLE_KEY = 'pk_test_x7BQNZlks7cWynfPFdrXSnDs'
+      return fetch('https://api.stripe.com/v1/tokens', {
+        headers: {
+          // Use the correct MIME type for your server
+          Accept: 'application/json',
+          // Use the correct Content Type to send data to Stripe
+          'Content-Type': 'application/x-www-form-urlencoded',
+          // Use the Stripe publishable key as Bearer
+          Authorization: `Bearer ${STRIPE_PUBLISHABLE_KEY}`
+        },
+        // Use a proper HTTP method
+        method: 'post',
+        // Format the credit card data to a string of key-value pairs
+        // divided by &
+        body: Object.keys(card)
+            .map(key => key + '=' + card[key])
+            .join('&')
+      }).then(response =>response.json()).then((jsonRespone)=>{
+        console.log("jsonRespone",jsonRespone)
+        if(jsonRespone.id!=null) {
+          this.getPaymentDone(jsonRespone.id)
+        }
+      }).catch((error => {
+        console.log("error i  payment:", error)
+      }));
+    }
+  };
   _onCardChange = form => {
     // console.log(form);
-    if (form["valid"] == true) {
-      this.setState({ buy_button_disabled: false });
-      this.setState({ number: form["values"]["number"] });
-      this.setState({ cvc: form["values"]["cvc"] });
-      this.setState({ expiry: form["values"]["expiry"] });
-    }
+    console.log("card form:",form)
+     console.log("card valid:",this.state)
+    this.setState({ buy_button_disabled: false });
+    this.setState({ number: form["values"]["number"] });
+    this.setState({ cvc: form["values"]["cvc"] });
+    this.setState({ expiry: form["values"]["expiry"] });
+
   };
 
   render() {
@@ -155,12 +239,51 @@ export default class ProductDetailScreen extends React.Component {
             visible={this.state.modalVisible}
             onRequestClose={() => {}}
           >
-            <View
-              style={{ paddingTop: 22, backgroundColor: "#8deb73", flex: 1 }}
-            >
-              <Text style={{ fontWeight: "bold", textAlign: "center" }}>
-                Buy Now
-              </Text>
+
+              <View style={{ backgroundColor: "#8deb73", flex: 1 }}>
+                <View
+                    style={{
+                      width: "100%",
+                      height: 70,
+                      backgroundColor: "#089D37",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingHorizontal: 20,
+                      paddingTop: 20,
+                      display: "flex",
+                      flexDirection: "row"
+                    }}
+                >
+                  {/* <Icon
+                style={{ paddingLeft: 20 }}
+                onPress={() => navigation.goBack()}
+                name="left"
+                color="#FFF"
+                size={30}
+              /> */}
+                  <TouchableOpacity
+                      onPress={() => {
+                        this.setModalVisible(!this.state.modalVisible);
+                      }}
+                      style={{ width: 25, height: 25 }}
+                  >
+                    <Image source={back} style={{ width: 25, height: 25 }}></Image>
+                  </TouchableOpacity>
+                  <Text
+                      style={{
+                        fontWeight: "700",
+                        textAlign: "center",
+                        color: "white",
+                        fontSize: 22,
+                        marginLeft: -15
+                      }}
+                  >
+                    Buy Now
+                  </Text>
+                  <View>
+                    <Text></Text>
+                  </View>
+                </View>
               <View style={{ marginTop: 40 }}>
                 <CreditCardInput
                   requiresPostalCode
@@ -168,39 +291,48 @@ export default class ProductDetailScreen extends React.Component {
                 />
                 <View style={{ marginTop: 30 }}>
                   <Button
-                    title="Buy"
-                    icon={
-                      <Icon
-                        name="shopping-cart"
-                        style={{ marginLeft: 30, marginTop: 10 }}
-                        size={17}
-                        color="black"
-                      />
-                    }
-                    iconRight
-                    buttonStyle={{ backgroundColor: "white" }}
-                    onPress={this.send_enquiry}
-                    titleStyle={{ color: "black" }}
+                      title="Buy"
+                      icon={
+                        <Icon1
+                            name="shopping-cart"
+                            style={{ marginLeft: 30, marginTop: 10 }}
+                            size={17}
+                            color="black"
+                        />
+                      }
+                      iconRight
+                      buttonStyle={{ backgroundColor: "white" }}
+                      onPress={this.getCreditCardToken}
+                      titleStyle={{ color: "black" }}
                   />
                 </View>
-                <View style={{ margin: 40 }}>
-                  <TouchableHighlight
-                    onPress={() => {
-                      this.setModalVisible(!this.state.modalVisible);
-                    }}
-                    style={{ paddingTop: 20 }}
-                  >
-                    <Text
-                      style={{ textAlign: "center", backgroundColor: "red" }}
-                    >
-                      Go Back
-                    </Text>
-                  </TouchableHighlight>
-                </View>
+
               </View>
             </View>
           </Modal>
+          <Modal
+              animationType="slide"
+              transparent={false}
+              visible={this.state.imageModal}
+              onRequestClose={() => {}}
+          >
+            <View
+                style={{ paddingTop: 22, backgroundColor: "#8deb73", flex: 1, justifyContent:"center",alignItems:"center" }}
+            >
+              <Image
+                  style={{width:"90%",height:"auto",aspectRatio:1,marginBottom:20}}
+                  source={{uri:this.selectedItem}}
+              />
+              <Button
+                  buttonStyle={styles.button}
+                  title= "Go Back"
+                  titleStyle={{fontSize: 20}}
+                  raised= {true}
+                  onPress={() => this.setState({imageModal:false})}
+              />
 
+            </View>
+          </Modal>
           <View
             style={{
               alignItems: "center",
@@ -212,9 +344,13 @@ export default class ProductDetailScreen extends React.Component {
             <ImageSlider
               style={styles.productImg}
               images={item.images}
-              customSlide={({ index, item, style, width }) => (
+              customSlide={({ index, item, style, width }) => {
+                console.log("slider selected item:",item)
+                this.selectedItem=item
+                return(
                 // It's important to put style here because it's got offset inside
-                <View
+                <TouchableOpacity
+                    onPress={()=>{this.setState({imageModal:true})}}
                   key={index}
                   style={[
                     style,
@@ -230,8 +366,8 @@ export default class ProductDetailScreen extends React.Component {
                       overflow: "hidden"
                     }}
                   />
-                </View>
-              )}
+                </TouchableOpacity>
+              )}}
             />
             <Text style={styles.name}>{item.title}</Text>
             <Text style={styles.price}>${item.price}</Text>
@@ -242,7 +378,7 @@ export default class ProductDetailScreen extends React.Component {
           <View style={styles.addToCarContainer}>
             <TouchableOpacity
               style={styles.shareButton}
-              onPress={() => this.setModalVisible(true)}
+              onPress={() => this.buyNowItem(item)}
             >
               <Text style={styles.shareButtonText}>Buy Now</Text>
             </TouchableOpacity>
@@ -374,5 +510,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 100,
     marginTop: 10
-  }
+  },
+  button: {
+    backgroundColor: '#5EA64A',
+    width: 300,
+
+  },
 });

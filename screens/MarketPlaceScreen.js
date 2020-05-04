@@ -369,7 +369,99 @@ export default class MarketPlaceScreen extends React.Component {
     });
     this.setState({ category: vall, categoryid: selectedid });
   };
+  getPaymentDone=async (token)=>{
 
+    console.log("Token:",await AsyncStorage.getItem("userToken"));
+    console.log("UID:",await AsyncStorage.getItem("uid"));
+    console.log("client:",await AsyncStorage.getItem("uid"));
+    console.log("Base_url:",BASE_URL+"orders");
+    fetch(BASE_URL+"orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "access-token": await AsyncStorage.getItem("userToken"),
+        uid: await AsyncStorage.getItem("uid"),
+        client: await AsyncStorage.getItem("client")
+      },
+      body: JSON.stringify({
+            "order": {
+              "amount": this.selectedItem.price,
+              "token": token,
+              "order_type": "item",
+              "id": this.selectedItem.id
+            }
+          }
+      )
+    })
+        .then(response => response.json())
+        .then(responseJson => {
+          console.log("ResponseJson payment:",responseJson);
+          if(responseJson.message){
+            Alert.alert(responseJson.message)
+          }
+
+        })
+
+        .catch(error => {
+          console.log(error);
+        });
+  };
+  getCreditCardToken = () => {
+    if(this.state.expiry!=null && this.state.number !=null) {
+      let expiry = this.state.expiry.split("/")
+
+      const card = {
+        'card[number]': this.state.number,
+        'card[exp_month]': expiry[0],
+        'card[exp_year]': expiry[1],
+        'card[cvc]': this.state.cvc
+      };
+
+      let STRIPE_PUBLISHABLE_KEY = 'pk_test_x7BQNZlks7cWynfPFdrXSnDs'
+      return fetch('https://api.stripe.com/v1/tokens', {
+        headers: {
+          // Use the correct MIME type for your server
+          Accept: 'application/json',
+          // Use the correct Content Type to send data to Stripe
+          'Content-Type': 'application/x-www-form-urlencoded',
+          // Use the Stripe publishable key as Bearer
+          Authorization: `Bearer ${STRIPE_PUBLISHABLE_KEY}`
+        },
+        // Use a proper HTTP method
+        method: 'post',
+        // Format the credit card data to a string of key-value pairs
+        // divided by &
+        body: Object.keys(card)
+            .map(key => key + '=' + card[key])
+            .join('&')
+      }).then(response =>response.json()).then((jsonRespone)=>{
+        console.log("jsonRespone",jsonRespone)
+        if(jsonRespone.id!=null) {
+          this.getPaymentDone(jsonRespone.id)
+        }
+      }).catch((error => {
+        console.log("error i  payment:", error)
+      }));
+    }
+  };
+  _onCardChange = form => {
+    // console.log(form);
+    console.log("card form:",form)
+
+
+      console.log("card valid:",this.state)
+      this.setState({ buy_button_disabled: false });
+      this.setState({ number: form["values"]["number"] });
+      this.setState({ cvc: form["values"]["cvc"] });
+      this.setState({ expiry: form["values"]["expiry"] });
+
+  };
+
+  buyNowItem(item){
+    console.log("item:",item)
+    this.selectedItem=item
+    this.setModalVisible(true)
+  }
   render() {
     return (
       <View style={styles.container}>
@@ -428,7 +520,7 @@ export default class MarketPlaceScreen extends React.Component {
                 marginTop: 40
               }}
             >
-              <CreditCardInput requiresPostalCode onChange={this._onChange} />
+              <CreditCardInput requiresPostalCode onChange={this._onCardChange} />
               <View
                 style={{
                   margin: 30
@@ -446,7 +538,7 @@ export default class MarketPlaceScreen extends React.Component {
                   }
                   iconRight
                   buttonStyle={{ backgroundColor: "white" }}
-                  onPress={this.send_enquiry}
+                  onPress={this.getCreditCardToken}
                   titleStyle={{ color: "black" }}
                 />
               </View>
@@ -685,7 +777,7 @@ export default class MarketPlaceScreen extends React.Component {
                                 style={styles.socialBarButton}
                                 onPress={() => {
                                   item.id !== ""
-                                    ? this.setModalVisible(true)
+                                    ? this.buyNowItem(item)
                                     : "";
                                 }}
                               >
