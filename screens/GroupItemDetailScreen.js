@@ -1,26 +1,11 @@
-import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  Alert,
-  ScrollView,
-  FlatList,
-  Modal,
-  TouchableHighlight,
-  AsyncStorage
-} from "react-native";
-import { Button, Input } from "react-native-elements";
 import Icon from "@expo/vector-icons/Ionicons";
-import { Table, Row, Rows } from "react-native-table-component";
-import {
-  CreditCardInput,
-  LiteCreditCardInput
-} from "react-native-credit-card-input";
+import React from "react";
+import { Alert, AsyncStorage, FlatList, Image, Modal, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from "react-native";
+import { CreditCardInput } from "react-native-credit-card-input";
+import { Button } from "react-native-elements";
 import ImageSlider from "react-native-image-slider";
-import {BASE_URL} from "../config/NetworkConstants";
+import { Rows, Table } from "react-native-table-component";
+import { BASE_URL } from "../config/NetworkConstants";
 
 export default class GroupItemDetailScreen extends React.Component {
   constructor(props) {
@@ -72,7 +57,7 @@ export default class GroupItemDetailScreen extends React.Component {
 
   send_enquiry = async () => {
     // Alert.alert('Sorry!! Your request cannot bbe processed right now. Please try again later')
-    fetch(BASE_URL+"checkout", {
+    fetch(BASE_URL + "checkout", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -106,7 +91,7 @@ export default class GroupItemDetailScreen extends React.Component {
 
   add_to_wishlist = async () => {
     const item = this.props.navigation.state.params.item;
-    fetch(BASE_URL+"wishlists/add-to-wishlist", {
+    fetch(BASE_URL + "wishlists/add-to-wishlist", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -121,7 +106,6 @@ export default class GroupItemDetailScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        console.log(responseJson);
         Alert.alert("Product added to wish list");
       })
 
@@ -131,12 +115,13 @@ export default class GroupItemDetailScreen extends React.Component {
   };
 
   _onCardChange = form => {
-    // console.log(form);
     if (form["valid"] == true) {
-      this.setState({ buy_button_disabled: false });
-      this.setState({ number: form["values"]["number"] });
-      this.setState({ cvc: form["values"]["cvc"] });
-      this.setState({ expiry: form["values"]["expiry"] });
+      this.setState({
+        buy_button_disabled: false,
+        number: form["values"]["number"],
+        cvc: form["values"]["cvc"],
+        expiry: form["values"]["expiry"]
+      });
     }
   };
 
@@ -149,7 +134,7 @@ export default class GroupItemDetailScreen extends React.Component {
             animationType="slide"
             transparent={false}
             visible={this.state.modalVisible}
-            onRequestClose={() => {}}
+            onRequestClose={() => { }}
           >
             <View
               style={{ paddingTop: 22, backgroundColor: "#8deb73", flex: 1 }}

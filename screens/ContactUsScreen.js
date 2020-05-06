@@ -1,18 +1,8 @@
 import React, { Component } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  AsyncStorage,
-  TextInput,
-  Alert
-} from "react-native";
+import { Alert, AsyncStorage, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Button, Header, Icon, Input } from "react-native-elements";
+import { BASE_URL } from "../config/NetworkConstants";
 
-import { Icon, Header, Input, Button } from "react-native-elements";
-import {BASE_URL} from "../config/NetworkConstants";
 
 export default class ContactUsScreen extends Component {
   constructor(props) {
@@ -28,7 +18,7 @@ export default class ContactUsScreen extends Component {
   }
 
   contactus = async () => {
-    fetch(BASE_URL+"contact-us", {
+    fetch(BASE_URL + "contact-us", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -71,7 +61,7 @@ export default class ContactUsScreen extends Component {
         <Text style={styles.heading}>Contact Us</Text>
         <View style={styles.paragraph}>
           <Text>Email</Text>
-          <Input placeholder="Email" value={this.state.email} />
+          <Input placeholder="Email" value={this.state.email} editable={false} />
         </View>
 
         <View style={styles.paragraph}>

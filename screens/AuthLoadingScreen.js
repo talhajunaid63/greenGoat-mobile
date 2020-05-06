@@ -1,12 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, ImageBackground, ActivityIndicator,
-  AsyncStorage, } from 'react-native';
-import {createAppContainer, createSwitchNavigator} from 'react-navigation';
-import {createStackNavigator} from 'react-navigation-stack';
-import { Button } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { Input } from 'react-native-elements';
-import { createBottomTabNavigator } from 'react-navigation-tabs'    
+import { ActivityIndicator, AsyncStorage, View } from 'react-native';
 
 class AuthLoadingScreen extends React.Component {
     constructor() {

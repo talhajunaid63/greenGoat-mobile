@@ -1,41 +1,17 @@
-import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  ImageBackground,
-  ActivityIndicator,
-  AsyncStorage,
-  Alert,
-  ScrollView,
-  Linking,
-  TouchableHighlight,
-  TouchableOpacity,
-  Picker,
-  CheckBox
-} from "react-native";
-import {BASE_URL} from "../config/NetworkConstants";
-import { createAppContainer, createSwitchNavigator } from "react-navigation";
-import { createStackNavigator } from "react-navigation-stack";
-import { Button } from "react-native-elements";
-import Icon from "react-native-vector-icons/FontAwesome";
-import { Input } from "react-native-elements";
-import { createBottomTabNavigator } from "react-navigation-tabs";
-import { getStatusBarHeight } from "react-native-status-bar-height";
 import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
+import * as Permissions from "expo-permissions";
+import React from "react";
+import { Image, ImageBackground, Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import AwesomeAlert from "react-native-awesome-alerts";
-import RadioForm, {
-  RadioButtonInput,
-  RadioButtonLabel
-} from "react-native-simple-radio-button";
-import { RadioGroup, RadioButton } from "react-native-flexi-radio-button";
-import phone from "../assets/images/phone.png";
-import land from "../assets/images/land.png";
+import CheckBox from 'react-native-check-box';
+import { Button, Input } from "react-native-elements";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Dropdown } from "react-native-material-dropdown";
-import * as Permissions from "expo-permissions";
+import { getStatusBarHeight } from "react-native-status-bar-height";
+import land from "../assets/images/land.png";
+import phone from "../assets/images/phone.png";
+import { BASE_URL } from "../config/NetworkConstants";
 
 var radio_props = [
   { label: "Cellphone  ", value: "cell" },
@@ -52,7 +28,9 @@ export default class SignUpScreen extends React.Component {
       password: "",
       password_confirmation: "",
       phone: "",
+      isChecked: false,
       phone_type: "Cellphone",
+      role: [],
       image_uri: null,
       image_base64: null,
       errormessage: "",
@@ -66,6 +44,15 @@ export default class SignUpScreen extends React.Component {
         {
           value: "Landline"
         }
+      ],
+      userTypeDropDown: [
+        { value: 'contractor', checked: false, label: 'Contractor' },
+        { value: 'appraiser', checked: false, label: 'Appraiser' },
+        { value: 'doner', checked: false, label: 'Doner' },
+        { value: 'buyer', checked: false, label: 'Buyer' },
+        { value: 'real_estate_agent', checked: false, label: 'Real Estate Agent' }
+
+
       ]
     };
   }
@@ -87,6 +74,24 @@ export default class SignUpScreen extends React.Component {
       this.props.navigation.navigate("Auth");
     }
   };
+  checkboxHandler = (obj, i) => {
+    const checkedOptions = this.state.userTypeDropDown;
+    checkedOptions[i].checked = !checkedOptions[i].checked
+    this.setState({
+      userTypeDropDown: [...this.state.userTypeDropDown]
+    })
+    let rolesArray = this.state.userTypeDropDown.filter((items) => {
+      return items.checked === true
+    });
+    let roles = []
+    rolesArray.map((item) => {
+      roles.push(item.value)
+    })
+    this.setState({
+      role: roles
+    })
+
+  }
 
   // getPhotoFromGallery = () => {
   //   ImagePicker.launchImageLibrary(null, (response)  => {
@@ -142,9 +147,9 @@ export default class SignUpScreen extends React.Component {
       this.setState({ image_base64: result.base64 });
     }
   };
-  updateTerms(){
+  updateTerms() {
 
-    this.setState({terms:!this.state.terms})
+    this.setState({ terms: !this.state.terms })
   }
 
   componentDidMount() {
@@ -162,8 +167,6 @@ export default class SignUpScreen extends React.Component {
 
 
   render() {
-    const { navigate } = this.props.navigation;
-    console.log(this.state.image_uri);
     return (
       <ImageBackground
         source={require("../assets/images/background.png")}
@@ -326,7 +329,22 @@ export default class SignUpScreen extends React.Component {
                 secureTextEntry={true}
               />
             </View>
-
+            <View style={{ width: '100%' }}>
+              <Text style={{ marginHorizontal: 15, fontSize: 18 }}>Please Select Type</Text>
+              {this.state.userTypeDropDown.map((obj, i) => (
+                <View style={styles.checkbox}>
+                  <CheckBox
+                    // style={{ padding: 10 }}
+                    onClick={() => this.checkboxHandler(obj, i)}
+                    isChecked={obj.checked}
+                    checkBoxColor={"black"}
+                    checkedCheckBoxColor={"#5EA64A"}
+                  >
+                  </CheckBox>
+                  <Text style={styles.text}>{obj.label}</Text>
+                </View>
+              ))}
+            </View>
             <View
               style={{
                 marginBottom: 20,
@@ -347,7 +365,7 @@ export default class SignUpScreen extends React.Component {
                 }}
               >
                 <Image
-                    resizeMode={"contain"}
+                  resizeMode={"contain"}
                   source={this.state.phone_type === "Cellphone" ? phone : land}
                   style={{ width: "20%", height: 22 }}
                 />
@@ -387,13 +405,14 @@ export default class SignUpScreen extends React.Component {
                   onChangeText={text => this.setState({ phone: text })}
                 />
               </View>
+
             </View>
 
             <View style={styles.checkcontainer}>
               <TouchableOpacity
-                  onPress={this.updateTerms.bind(this)}
-                  style={styles.checkbox_container}>
-                {this.state.terms===true && <Text>
+                onPress={this.updateTerms.bind(this)}
+                style={styles.checkbox_container}>
+                {this.state.terms === true && <Text>
                   {'✓'}
                 </Text>}
               </TouchableOpacity>
@@ -431,7 +450,7 @@ export default class SignUpScreen extends React.Component {
           message={this.state.errormessage}
           closeOnTouchOutside={false}
           closeOnHardwareBackPress={true}
-          showCancelButton={this.state.errortitle!=="Loading"}
+          showCancelButton={this.state.errortitle !== "Loading"}
           showConfirmButton={false}
           cancelText="Ok"
           confirmText=""
@@ -449,13 +468,16 @@ export default class SignUpScreen extends React.Component {
   }
   SignupApi = async () => {
     if (this.state.terms) {
-      this.setState({ errormessage: "In progress...." });
-      this.setState({ errortitle: "Loading" });
+      this.setState({
+        errormessage: "In progress....",
+        errortitle: "Loading"
+      });
       this.showAlert();
-      fetch(BASE_URL+"/api/auth/", {
+      fetch(BASE_URL + "auth", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json',
+          'Accept': 'application/json, text/plain'
         },
         body: JSON.stringify({
           firstname: this.state.firstname,
@@ -465,6 +487,7 @@ export default class SignUpScreen extends React.Component {
           password_confirmation: this.state.password_confirmation,
           confirm_success_url: "/",
           phone: this.state.phone,
+          role: this.state.role,
           phone_type:
             this.state.phone_type === "Cellphone"
               ? "cell"
@@ -474,22 +497,22 @@ export default class SignUpScreen extends React.Component {
       })
         .then(response => response.json())
         .then(responseJson => {
-          console.log("Response::",responseJson);
-          if (responseJson["status"] == "success") {
+          if (responseJson["status"] == 'success') {
             // this.hideAlert();
             this.setState({
-              errormessage: "Please check your email to confirm registration"
+              errormessage: "Please check your email to confirm registration",
+              errortitle: "Success",
+              signup_success: "true"
             });
-            this.setState({ errortitle: "Success" });
-            this.setState({ signup_success: "true" });
+
             this.showAlert();
             // Alert.alert("Please check your email to confirm registration")
           } else {
             // this.hideAlert();
             this.setState({
-              errormessage: responseJson["errors"].full_messages[0]
+              // errormessage: responseJson["errors"].full_messages[0],
+              errortitle: "Error"
             });
-            this.setState({ errortitle: "Error" });
             this.showAlert();
             // Alert.alert(responseJson["errors"].full_messages[0])
           }
@@ -499,8 +522,8 @@ export default class SignUpScreen extends React.Component {
           console.error(error);
         });
     }
-    else{
-      this.setState({ errormessage: "Kindly accept terms and conditions",errortitle: "Alert",      showAlert: true  });
+    else {
+      this.setState({ errormessage: "Kindly accept terms and conditions", errortitle: "Alert", showAlert: true });
 
     }
   };
@@ -531,14 +554,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginVertical: 20
   },
-  checkbox_container:{
-  height:20,
-  width:20,
-  borderWidth:1,
-    borderColor:"#5EA64A",
-    marginEnd:10,
-    justifyContent:'center',
-    alignItems:'center',
+  checkbox_container: {
+    height: 20,
+    width: 20,
+    borderWidth: 1,
+    borderColor: "#5EA64A",
+    marginEnd: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   home_image: {
     alignItems: "center",
@@ -570,5 +593,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     flexDirection: "row",
     alignItems: "center"
-  }
+  },
+  checkbox: {
+    flexDirection: "row",
+    alignItems: "center",
+    // alignItems: "center",
+    marginVertical: 5,
+    marginHorizontal: 10
+    // paddingVertical: 5,
+    // width: '90%'
+  },
+  text: {
+    color: "black",
+    fontSize: 18,
+    marginHorizontal: 5
+  },
 });

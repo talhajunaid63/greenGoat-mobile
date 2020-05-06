@@ -1,28 +1,15 @@
+import { Form } from "native-base";
 import React, { Component } from "react";
 import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  ImageBackground,
-  Alert,
-  ScrollView,
-  KeyboardAvoidingView,
-  ActivityIndicator,
-  Picker,
-  AsyncStorage,
-  TouchableOpacity
+  ActivityIndicator, AsyncStorage, ImageBackground, Platform,
+  KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity, View
 } from "react-native";
-import { Form, Item, Label } from "native-base";
-import { Button, Input, Icon } from "react-native-elements";
-import * as ImagePicker from "expo-image-picker";
-import Constants from "expo-constants";
-import * as Permissions from "expo-permissions";
 import AnimatedMultistep from "react-native-animated-multistep";
 import AwesomeAlert from "react-native-awesome-alerts";
+import { Button, Icon, Input } from "react-native-elements";
 import Select2 from "react-native-select-two";
-import {BASE_URL} from "../config/NetworkConstants";
-import { NavigationActions, StackActions } from 'react-navigation'
+import { NavigationActions, StackActions } from 'react-navigation';
+import { BASE_URL } from "../config/NetworkConstants";
 var city_names = [
   "Aberdeen",
   "Abilene",
@@ -548,8 +535,6 @@ class step1 extends Component {
   }
 
   nextStep = () => {
-    console.log("Calling next step");
-    console.log(this.state.address);
     if (this.state.address) {
       this.setState({ error: false });
     } else {
@@ -631,9 +616,7 @@ export class step2 extends Component {
   componentDidMount() {
     const { getState } = this.props;
     const state = getState();
-    this.setState({ city: state["city"] });
-    this.setState({ state: state["state"] });
-    this.setState({ zip: state["zip"] });
+    this.setState({ city: state["city"], state: state["state"], zip: state["zip"] });
   }
 
   nextStep = () => {
@@ -661,7 +644,6 @@ export class step2 extends Component {
     // // var errorDiv = container.find("div.text-error");
     // var clientKey =
     //   "js-9qZHzu2Flc59Eq5rx10JdKERovBlJp3TQ3ApyC4TOa3tA8U7aVRnFwf41RpLgtE7";
-    console.log("This.state.zip:",this.state.zip);
     var url = `http://ctp-zip-api.herokuapp.com/zip/${this.state.zip}`;
     // fetch(url, {
     //   method: "GET"
@@ -675,7 +657,6 @@ export class step2 extends Component {
     fetch(url)
       .then(response => response.json())
       .then(data => {
-        console.log("Data:",data[0]);
         this.setState({
           city: data[0].City,
           state: data[0].State,
@@ -685,7 +666,7 @@ export class step2 extends Component {
         });
       })
       .catch(error => {
-        console.log("Error:",error);
+        console.log("Error:", error);
         this.setState({
           iszipError: true,
           loading: false,
@@ -866,7 +847,6 @@ export class step3 extends Component {
 
   nextStep = () => {
     const { next, saveState } = this.props;
-    console.log(this.state.type_of_project);
     saveState({ type: this.state.type_of_project });
     next();
   };
@@ -911,12 +891,16 @@ export class step3 extends Component {
             listEmptyTitle="No results found"
             selectedTitleStyle={{ color: "white" }}
             onSelect={data => {
-              this.setState({ data });
-              this.setState({ type_of_project: data[0] });
+              this.setState({
+                data,
+                type_of_project: data[0]
+              });
             }}
             onRemoveItem={data => {
-              this.setState({ data });
-              this.setState({ type_of_project: data[0] });
+              this.setState({
+                data,
+                type_of_project: data[0]
+              });
             }}
           />
         </View>
@@ -953,7 +937,6 @@ export class step4 extends Component {
   componentDidMount() {
     const { getState } = this.props;
     const state = getState();
-    console.log(state);
   }
 
   nextStep = () => {
@@ -971,7 +954,7 @@ export class step4 extends Component {
             raised={true}
             buttonStyle={styles.submit_button}
             onPress={this.nextStep}
-            // onPress={() => this.donationformsubmission()}
+          // onPress={() => this.donationformsubmission()}
           />
         </View>
         <View
@@ -1068,8 +1051,7 @@ export default class DonationScreen extends React.Component {
   }
 
   async donationformsubmission() {
-    this.setState({ errormessage: "In progress...." });
-    this.setState({ errortitle: "Please wait" });
+    this.setState({ errormessage: "In progress....", errortitle: "Please wait" });
     this.showAlert();
     if (
       this.state.address &&
@@ -1078,7 +1060,7 @@ export default class DonationScreen extends React.Component {
       this.state.zip &&
       this.state.type
     ) {
-      fetch(BASE_URL+"projects/zillow-flow", {
+      fetch(BASE_URL + "projects/zillow-flow", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1097,8 +1079,10 @@ export default class DonationScreen extends React.Component {
       })
         .then(response => response.json())
         .then(responseJson => {
-          this.setState({ errormessage: responseJson["message"] });
-          this.setState({ errortitle: "Response" });
+          this.setState({
+            errormessage: responseJson["message"],
+            errortitle: "Response"
+          });
           this.showAlert();
         })
         .catch(err => {
@@ -1108,8 +1092,7 @@ export default class DonationScreen extends React.Component {
       // Alert.alert('Success', 'Please check you email for response. Thankyou !')
     } else {
       // Alert.alert('Error', 'Please fill all fields')
-      this.setState({ errormessage: "Please fill all fields" });
-      this.setState({ errortitle: "Error" });
+      this.setState({ errormessage: "Please fill all fields", errortitle: "Error" });
       this.showAlert();
     }
   }
@@ -1117,7 +1100,7 @@ export default class DonationScreen extends React.Component {
   render() {
     const { image } = this.state;
     return (
-      <KeyboardAvoidingView behavior="padding">
+      <KeyboardAvoidingView {...(Platform.OS === 'ios' && { behavior: 'padding' })} >
         <ImageBackground
           source={require("../assets/images/background.png")}
           style={{ width: "100%", height: "100%" }}
@@ -1149,7 +1132,7 @@ export default class DonationScreen extends React.Component {
               message={this.state.errormessage}
               closeOnTouchOutside={false}
               closeOnHardwareBackPress={true}
-              showCancelButton={this.state.errortitle==="Response"}
+              showCancelButton={this.state.errortitle === "Response"}
               showConfirmButton={false}
               cancelText="Ok"
               confirmText=""
@@ -1157,15 +1140,15 @@ export default class DonationScreen extends React.Component {
               overlayStyle={{ backgroundColor: "#0000" }}
               onCancelPressed={() => {
                 this.props
-                    .navigation
-                    .dispatch(StackActions.reset({
-                      index: 0,
-                      actions: [
-                        NavigationActions.navigate({
-                          routeName: 'DashboardTabNavigator',
-                        }),
-                      ],
-                    }))
+                  .navigation
+                  .dispatch(StackActions.reset({
+                    index: 0,
+                    actions: [
+                      NavigationActions.navigate({
+                        routeName: 'DashboardTabNavigator',
+                      }),
+                    ],
+                  }))
                 this.hideAlert();
               }}
               onConfirmPressed={() => {

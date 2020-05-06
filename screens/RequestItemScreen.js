@@ -1,38 +1,11 @@
+import moment from 'moment';
 import React from "react";
-import {
-    StyleSheet,
-    Text,
-    View,
-    TouchableOpacity,
-    Image,
-    Alert,
-    ScrollView,
-    FlatList,
-    Modal,
-    TouchableHighlight,
-    Picker,
-    AsyncStorage,
-    ActivityIndicator
-} from "react-native";
-import {BASE_URL} from "../config/NetworkConstants";
-import  moment from 'moment';
-import {
-    Card,
-    ListItem,
-    Button,
-    Icon,
-    Input,
-    SearchBar,
-    Slider,
-    Header
-} from "react-native-elements";
+import { ActivityIndicator, Alert, AsyncStorage, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { CreditCardInput } from "react-native-credit-card-input";
+import { Button, Header, Icon, Input } from "react-native-elements";
 import Icon1 from 'react-native-vector-icons/AntDesign';
-import {
-    CreditCardInput,
-    LiteCreditCardInput
-} from "react-native-credit-card-input";
-import ImageSlider from "react-native-image-slider";
 import back from "../assets/images/back.png";
+import { BASE_URL } from "../config/NetworkConstants";
 
 export default class RequestItemScreen extends React.Component {
     constructor(props) {
@@ -55,7 +28,7 @@ export default class RequestItemScreen extends React.Component {
                     uom: "",
                     serial: "",
                     images: "",
-                    progressLoading:false,
+                    progressLoading: false,
                 }
             ],
             wishlist_id: "",
@@ -88,7 +61,7 @@ export default class RequestItemScreen extends React.Component {
 
 
     async renderMyData() {
-        fetch(BASE_URL+"wishlists", {
+        fetch(BASE_URL + "wishlists", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -99,30 +72,29 @@ export default class RequestItemScreen extends React.Component {
         })
             .then(response => response.json())
             .then(responseJson => {
-                console.log("ResponseJson:",responseJson);
-                if(responseJson==null){
+                if (responseJson == null) {
                     Alert.alert("Unable to refresh list");
                     this.setState(
                         {
-                            progressLoading:false,
-                            addMoreModalVisible:false,
+                            progressLoading: false,
+                            addMoreModalVisible: false,
                         })
                 }
-                 else  if(responseJson.length>0) {
+                else if (responseJson.length > 0) {
                     this.setState(
                         {
-                            progressLoading:false,
-                            addMoreModalVisible:false,
+                            progressLoading: false,
+                            addMoreModalVisible: false,
                             listData: responseJson,
                         }
                     );
                 }
-                else if(responseJson.length===0){
+                else if (responseJson.length === 0) {
                     Alert.alert("You have zero items in wishlist");
                     this.setState(
                         {
-                            progressLoading:false,
-                            addMoreModalVisible:false,
+                            progressLoading: false,
+                            addMoreModalVisible: false,
                             listData: responseJson,
                         })
                 }
@@ -131,8 +103,8 @@ export default class RequestItemScreen extends React.Component {
                 Alert.alert("Unable to refresh list");
                 this.setState(
                     {
-                        progressLoading:false,
-                        addMoreModalVisible:false,
+                        progressLoading: false,
+                        addMoreModalVisible: false,
                     })
 
             });
@@ -146,7 +118,7 @@ export default class RequestItemScreen extends React.Component {
         this.setState({ modalVisible: visible });
     }
     setAddMoreModalVisible(visible) {
-        this.setState({ addMoreModalVisible: visible, Name:"", Description:"" });
+        this.setState({ addMoreModalVisible: visible, Name: "", Description: "" });
     }
 
     send_enquiry = () => {
@@ -156,8 +128,7 @@ export default class RequestItemScreen extends React.Component {
         );
     };
     remove_from_wishlist = async product_id => {
-        console.log("Calling");
-        fetch(BASE_URL+"wishlists/"+product_id, {
+        fetch(BASE_URL + "wishlists/" + product_id, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -173,19 +144,19 @@ export default class RequestItemScreen extends React.Component {
             .then(response => response.json())
             .then(responseJson => {
                 Alert.alert("Product removed from wish list");
-                 this.renderMyData();
+                this.renderMyData();
 
             })
 
             .catch(error => {
-                console.log("ERROR:",error);
+                console.log("ERROR:", error);
             });
     };
 
     add_to_favourite = async product_id => {
 
-        this.setState({progressLoading:true})
-        fetch(BASE_URL+"wishlists", {
+        this.setState({ progressLoading: true })
+        fetch(BASE_URL + "wishlists", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -201,61 +172,61 @@ export default class RequestItemScreen extends React.Component {
             .then(response => response.json())
             .then(responseJson => {
 
-                if(responseJson.name!=null){
-                     this.renderMyData();
-                    this.setState({progressLoading:false,addMoreModalVisible:false})
-                   // this.setAddMoreModalVisible(false);
+                if (responseJson.name != null) {
+                    this.renderMyData();
+                    this.setState({ progressLoading: false, addMoreModalVisible: false })
+                    // this.setAddMoreModalVisible(false);
                 }
-                else{
+                else {
                     Alert.alert("Request Failed")
-                    this.setState({progressLoading:false})
+                    this.setState({ progressLoading: false })
                 }
-              //  this.renderMyData();
-            //    Alert.alert("Product removed from wish list");
+                //  this.renderMyData();
+                //    Alert.alert("Product removed from wish list");
             })
 
             .catch(error => {
                 Alert.alert("Request Failed");
-                this.setState({progressLoading:false})
-                console.log(error);
+                this.setState({ progressLoading: false })
+
             });
     };
     addMore = () => {
         this.setState({ addMoreModalVisible: true });
     };
 
-    renderItem=({item})=>{
+    renderItem = ({ item }) => {
 
-        return(
+        return (
             <View style={styles.itemContainer}>
-                <View style={{flex:1}}>
-                    <View style={{flex:1}}>
-                    <View style={styles.nameContainer}>
-                        <Text style={styles.itemNameStyle}>
-                            {"Name :"}
-                        </Text>
-                    <Text style={styles.itemNameStyle}>
-                        {item.name}
-                    </Text>
-                    </View>
+                <View style={{ flex: 1 }}>
+                    <View style={{ flex: 1 }}>
+                        <View style={styles.nameContainer}>
+                            <Text style={styles.itemNameStyle}>
+                                {"Name :"}
+                            </Text>
+                            <Text style={styles.itemNameStyle}>
+                                {item.name}
+                            </Text>
+                        </View>
 
-                    <Text style={styles.descriptionStyle}>
-                        {item.description}
-                    </Text>
+                        <Text style={styles.descriptionStyle}>
+                            {item.description}
+                        </Text>
                     </View>
                     <View style={styles.nameContainer}>
                         <Text style={styles.itemNameStyle}>
                             {"Date :"}
                         </Text>
                         <Text style={styles.itemNameStyle}>
-                            { moment(item.created_at).format('MMMM Do YY')}
+                            {moment(item.created_at).format('MMMM Do YY')}
                         </Text>
                     </View>
                 </View>
                 <TouchableOpacity
                     onPress={() => this.remove_from_wishlist(item.id)}
-                   style={styles.deleteIconContainer}>
-                <Icon1 name={"delete"} size={30} color="#900" />
+                    style={styles.deleteIconContainer}>
+                    <Icon1 name={"delete"} size={30} color="#900" />
                 </TouchableOpacity>
             </View>
         )
@@ -263,8 +234,8 @@ export default class RequestItemScreen extends React.Component {
     render() {
         if (this.state.progress == false) {
             return (
-                <View style={{marginTop: 200}}>
-                    <ActivityIndicator size="large" color="#00ff00"/>
+                <View style={{ marginTop: 200 }}>
+                    <ActivityIndicator size="large" color="#00ff00" />
                 </View>
             );
         }
@@ -309,7 +280,7 @@ export default class RequestItemScreen extends React.Component {
                     animationType="slide"
                     transparent={false}
                     visible={this.state.addMoreModalVisible}
-                    onRequestClose={() => {}}
+                    onRequestClose={() => { }}
                 >
                     <View style={{ backgroundColor: "white", flex: 1 }}>
 
@@ -322,7 +293,7 @@ export default class RequestItemScreen extends React.Component {
                                     }}
                                     style={{ width: 25, height: 25 }}
                                 >
-                                    <Image source={back} style={{ width: 25, height: 25 }}/>
+                                    <Image source={back} style={{ width: 25, height: 25 }} />
                                 </TouchableOpacity>
                             }
 
@@ -331,51 +302,51 @@ export default class RequestItemScreen extends React.Component {
                                 style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
                             }}
                         />
-              {/*          <View*/}
-              {/*              style={{*/}
-              {/*                  width: "100%",*/}
-              {/*                  height: 70,*/}
-              {/*                  backgroundColor: "#089D37",*/}
-              {/*                  justifyContent: "space-between",*/}
-              {/*                  alignItems: "center",*/}
-              {/*                  paddingHorizontal: 20,*/}
-              {/*                  paddingTop: 20,*/}
-              {/*                  display: "flex",*/}
-              {/*                  flexDirection: "row"*/}
-              {/*              }}*/}
-              {/*          >*/}
-              {/*              /!* <Icon*/}
-              {/*  style={{ paddingLeft: 20 }}*/}
-              {/*  onPress={() => navigation.goBack()}*/}
-              {/*  name="left"*/}
-              {/*  color="#FFF"*/}
-              {/*  size={30}*/}
-              {/*/> *!/*/}
+                        {/*          <View*/}
+                        {/*              style={{*/}
+                        {/*                  width: "100%",*/}
+                        {/*                  height: 70,*/}
+                        {/*                  backgroundColor: "#089D37",*/}
+                        {/*                  justifyContent: "space-between",*/}
+                        {/*                  alignItems: "center",*/}
+                        {/*                  paddingHorizontal: 20,*/}
+                        {/*                  paddingTop: 20,*/}
+                        {/*                  display: "flex",*/}
+                        {/*                  flexDirection: "row"*/}
+                        {/*              }}*/}
+                        {/*          >*/}
+                        {/*              /!* <Icon*/}
+                        {/*  style={{ paddingLeft: 20 }}*/}
+                        {/*  onPress={() => navigation.goBack()}*/}
+                        {/*  name="left"*/}
+                        {/*  color="#FFF"*/}
+                        {/*  size={30}*/}
+                        {/*/> *!/*/}
 
 
-                            {/*<TouchableOpacity*/}
-                            {/*    onPress={() => {*/}
-                            {/*        this.setAddMoreModalVisible(!this.state.addMoreModalVisible);*/}
-                            {/*    }}*/}
-                            {/*    style={{ width: 25, height: 25 }}*/}
-                            {/*>*/}
-                            {/*    <Image source={back} style={{ width: 25, height: 25 }}></Image>*/}
-                            {/*</TouchableOpacity>*/}
-              {/*              <Text*/}
-              {/*                  style={{*/}
-              {/*                      fontWeight: "700",*/}
-              {/*                      textAlign: "center",*/}
-              {/*                      color: "white",*/}
-              {/*                      fontSize: 22,*/}
-              {/*                      marginLeft: -15*/}
-              {/*                  }}*/}
-              {/*              >*/}
-              {/*                  Add To Wishlist*/}
-              {/*              </Text>*/}
-              {/*              <View>*/}
-              {/*                  <Text></Text>*/}
-              {/*              </View>*/}
-              {/*          </View>*/}
+                        {/*<TouchableOpacity*/}
+                        {/*    onPress={() => {*/}
+                        {/*        this.setAddMoreModalVisible(!this.state.addMoreModalVisible);*/}
+                        {/*    }}*/}
+                        {/*    style={{ width: 25, height: 25 }}*/}
+                        {/*>*/}
+                        {/*    <Image source={back} style={{ width: 25, height: 25 }}></Image>*/}
+                        {/*</TouchableOpacity>*/}
+                        {/*              <Text*/}
+                        {/*                  style={{*/}
+                        {/*                      fontWeight: "700",*/}
+                        {/*                      textAlign: "center",*/}
+                        {/*                      color: "white",*/}
+                        {/*                      fontSize: 22,*/}
+                        {/*                      marginLeft: -15*/}
+                        {/*                  }}*/}
+                        {/*              >*/}
+                        {/*                  Add To Wishlist*/}
+                        {/*              </Text>*/}
+                        {/*              <View>*/}
+                        {/*                  <Text></Text>*/}
+                        {/*              </View>*/}
+                        {/*          </View>*/}
                         <View style={{ marginTop: 40 }}>
                             <View style={styles.paragraph}>
                                 <Text>Name</Text>
@@ -385,7 +356,7 @@ export default class RequestItemScreen extends React.Component {
                                     value={this.state.Name}
                                 />
                             </View>
-                           <View style={styles.paragraph}>
+                            <View style={styles.paragraph}>
                                 <Text>Description</Text>
                                 <Input
                                     onChangeText={text => this.setState({ Description: text })}
@@ -394,8 +365,8 @@ export default class RequestItemScreen extends React.Component {
                                 />
                             </View>
                             <View style={styles.paragraph}>
-                                {this.state.progressLoading===true &&   <ActivityIndicator size="large" color="#00ff00" />}
-                                {this.state.progressLoading!==true && <Button
+                                {this.state.progressLoading === true && <ActivityIndicator size="large" color="#00ff00" />}
+                                {this.state.progressLoading !== true && <Button
                                     title="Add to Wishlist"
                                     buttonStyle={{ backgroundColor: "#089D37" }}
                                     onPress={this.add_to_favourite}
@@ -409,7 +380,7 @@ export default class RequestItemScreen extends React.Component {
                     animationType="slide"
                     transparent={false}
                     visible={this.state.modalVisible}
-                    onRequestClose={() => {}}
+                    onRequestClose={() => { }}
                 >
                     <View style={{ backgroundColor: "#8deb73", flex: 1 }}>
                         <View
@@ -481,18 +452,19 @@ export default class RequestItemScreen extends React.Component {
                 <FlatList
                     keyExtractor={item => {
 
-                        return item.id}}
+                        return item.id
+                    }}
                     data={this.state.listData}
                     ListEmptyComponent={() => {
-                        return( <View style={styles.emptyContainer} >
-                                <Text style={{fontSize:20, fontWeight:"bold", paddingHorizontal:20, marginTop:20}}>
-                                    There are no items
+                        return (<View style={styles.emptyContainer} >
+                            <Text style={{ fontSize: 20, fontWeight: "bold", paddingHorizontal: 20, marginTop: 20 }}>
+                                There are no items
                                 </Text>
-                            </View>
+                        </View>
                         )
 
                     }}
-                    renderItem={this.renderItem}/>
+                    renderItem={this.renderItem} />
 
             </View>
         );
@@ -518,9 +490,9 @@ const styles = StyleSheet.create({
     separator: {
         marginTop: 10
     },
-    emptyContainer:{
-        justifyContent:"center",
-        alignItems:"center",
+    emptyContainer: {
+        justifyContent: "center",
+        alignItems: "center",
     },
     /******** card **************/
     card: {
@@ -643,41 +615,41 @@ const styles = StyleSheet.create({
         fontSize: 20,
         justifyContent: "center"
     },
-    itemNameStyle:{
-      fontSize:18,
-        marginEnd:10,
+    itemNameStyle: {
+        fontSize: 18,
+        marginEnd: 10,
         fontWeight: "800",
-        color:"#FFFFFF",
+        color: "#FFFFFF",
     },
-    descriptionStyle:{
-        fontSize:14,
-        marginEnd:10,
+    descriptionStyle: {
+        fontSize: 14,
+        marginEnd: 10,
         fontWeight: "500",
-        color:"#FFFFFF",
+        color: "#FFFFFF",
     },
-    nameContainer:{
-        flexDirection:"row",
-        alignItems:'center',
+    nameContainer: {
+        flexDirection: "row",
+        alignItems: 'center',
 
 
     },
-    itemContainer:{
-        width:"80%",
-        flexDirection:"row",
-        marginStart:"10%",
-        marginEnd:"10%",
-        paddingBottom:10,
-        paddingTop:10,
-        paddingStart:10,
-        paddingEnd:10,
-        borderRadius:12,
+    itemContainer: {
+        width: "80%",
+        flexDirection: "row",
+        marginStart: "10%",
+        marginEnd: "10%",
+        paddingBottom: 10,
+        paddingTop: 10,
+        paddingStart: 10,
+        paddingEnd: 10,
+        borderRadius: 12,
         backgroundColor: "#5EA64A",
-        minHeight:100,
-        marginTop:20,
-        },
-    deleteItemContainer:{
-        width:50,
-        justifyContent:"center",
-        alignItems:"center"
+        minHeight: 100,
+        marginTop: 20,
+    },
+    deleteItemContainer: {
+        width: 50,
+        justifyContent: "center",
+        alignItems: "center"
     }
 });

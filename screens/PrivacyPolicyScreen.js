@@ -1,14 +1,7 @@
 import React, { Component } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  ScrollView
-} from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
+import { Header, Icon } from "react-native-elements";
 
-import { Icon, Header, Input, Button } from "react-native-elements";
 
 export default class PrivacyPolicyScreen extends Component {
   render() {

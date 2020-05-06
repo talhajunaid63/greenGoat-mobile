@@ -1,36 +1,10 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  Alert,
-  ScrollView,
-  FlatList,
-  Modal,
-  TouchableHighlight,
-  Picker,
-  AsyncStorage,
-  ActivityIndicator
-} from "react-native";
-import {
-  Card,
-  ListItem,
-  Button,
-  Icon,
-  Input,
-  SearchBar,
-  Slider,
-  Header
-} from "react-native-elements";
-import {
-  CreditCardInput,
-  LiteCreditCardInput
-} from "react-native-credit-card-input";
+import { ActivityIndicator, Alert, AsyncStorage, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { CreditCardInput } from "react-native-credit-card-input";
+import { Button, Header, Icon, Input } from "react-native-elements";
 import ImageSlider from "react-native-image-slider";
 import back from "../assets/images/back.png";
-import {BASE_URL} from "../config/NetworkConstants";
+import { BASE_URL } from "../config/NetworkConstants";
 
 export default class WishListScreen extends React.Component {
   constructor(props) {
@@ -92,7 +66,6 @@ export default class WishListScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-          console.log("Favourites:",responseJson);
         this.setState(
           {
             data: responseJson["products"],
