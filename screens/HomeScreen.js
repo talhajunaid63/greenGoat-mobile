@@ -6,8 +6,7 @@ import {
 import { Button } from 'react-native-elements';
 import { SliderBox } from "react-native-image-slider-box";
 import {BASE_URL} from "../config/NetworkConstants";
-import { Notifications } from 'expo';
-import * as Permissions from 'expo-permissions';
+
 import Global from "../config/GlobalState"
 
 export default class HomeScreen extends React.Component {
@@ -23,28 +22,7 @@ export default class HomeScreen extends React.Component {
       }
 
 
-    getPushNotificationPermissions = async () => {
-        const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-        let finalStatus = existingStatus;
 
-        // only ask if permissions have not already been determined, because
-        // iOS won't necessarily prompt the user a second time.
-        if (existingStatus !== 'granted') {
-            // Android remote notification permissions are granted during the app
-            // install, so this will only ask on iOS
-            const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-            finalStatus = status;
-        }
-
-        // Stop here if the user did not grant permissions
-        if (finalStatus !== 'granted') {
-            return;
-        }
-        console.log(finalStatus)
-
-        // Get the token that uniquely identifies this device
-        console.log("Notification Token: ", await Notifications.getExpoPushTokenAsync());
-    }
    async remove_from_wishlist() {
 
         console.log("Token:",await AsyncStorage.getItem("userToken"));
@@ -157,7 +135,7 @@ export default class HomeScreen extends React.Component {
      }
     componentDidMount() {
         //this.remove_from_wishlist();
-        //this.getPushNotificationPermissions();
+
        // let data=this.getCreditCardToken()
         this.getPaymentDone()
        // console.log("data:",data)
