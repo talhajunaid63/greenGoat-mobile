@@ -6,6 +6,8 @@ import { Button, Header, Icon, Input } from "react-native-elements";
 import Icon1 from 'react-native-vector-icons/AntDesign';
 import back from "../assets/images/back.png";
 import { BASE_URL } from "../config/NetworkConstants";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
 
 export default class RequestItemScreen extends React.Component {
     constructor(props) {
@@ -90,7 +92,7 @@ export default class RequestItemScreen extends React.Component {
                     );
                 }
                 else if (responseJson.length === 0) {
-                    Alert.alert("You have zero items in wishlist");
+                    // Alert.alert("You have zero items in wishlist");
                     this.setState(
                         {
                             progressLoading: false,
@@ -143,6 +145,7 @@ export default class RequestItemScreen extends React.Component {
         })
             .then(response => response.json())
             .then(responseJson => {
+
                 Alert.alert("Product removed from wish list");
                 this.renderMyData();
 
@@ -347,32 +350,39 @@ export default class RequestItemScreen extends React.Component {
                         {/*                  <Text></Text>*/}
                         {/*              </View>*/}
                         {/*          </View>*/}
-                        <View style={{ marginTop: 40 }}>
-                            <View style={styles.paragraph}>
-                                <Text>Name</Text>
-                                <Input
-                                    onChangeText={text => this.setState({ Name: text })}
-                                    placeholder="Name"
-                                    value={this.state.Name}
-                                />
+                        <KeyboardAwareScrollView
+                            enableOnAndroid={true}
+                            extraHeight={-180}
+                            extraScrollHeight={-180}
+                        >
+                            <View style={{ marginTop: 40 }}>
+
+                                <View style={styles.paragraph}>
+                                    <Text>Name</Text>
+                                    <Input
+                                        onChangeText={text => this.setState({ Name: text })}
+                                        placeholder="Name"
+                                        value={this.state.Name}
+                                    />
+                                </View>
+                                <View style={styles.paragraph}>
+                                    <Text>Description</Text>
+                                    <Input
+                                        onChangeText={text => this.setState({ Description: text })}
+                                        placeholder="Description"
+                                        value={this.state.Description}
+                                    />
+                                </View>
+                                <View style={styles.paragraph}>
+                                    {this.state.progressLoading === true && <ActivityIndicator size="large" color="#00ff00" />}
+                                    {this.state.progressLoading !== true && <Button
+                                        title="Add to Wishlist"
+                                        buttonStyle={{ backgroundColor: "#089D37" }}
+                                        onPress={this.add_to_favourite}
+                                    />}
+                                </View>
                             </View>
-                            <View style={styles.paragraph}>
-                                <Text>Description</Text>
-                                <Input
-                                    onChangeText={text => this.setState({ Description: text })}
-                                    placeholder="Description"
-                                    value={this.state.Description}
-                                />
-                            </View>
-                            <View style={styles.paragraph}>
-                                {this.state.progressLoading === true && <ActivityIndicator size="large" color="#00ff00" />}
-                                {this.state.progressLoading !== true && <Button
-                                    title="Add to Wishlist"
-                                    buttonStyle={{ backgroundColor: "#089D37" }}
-                                    onPress={this.add_to_favourite}
-                                />}
-                            </View>
-                        </View>
+                        </KeyboardAwareScrollView>
                     </View>
                 </Modal>
 

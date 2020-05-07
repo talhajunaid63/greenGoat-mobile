@@ -14,8 +14,8 @@ export default class SignInScreen extends React.Component {
       userEmail: "",
       showAlert: false,
       Loader: false,
-      errortitle: "Failed",
-      errormessage: 'Something went wrong',
+      errortitle: "Succces",
+      errormessage: 'An email has been sent containing instructions for resetting your password',
       signup_success: "false",
     };
   }
@@ -23,9 +23,11 @@ export default class SignInScreen extends React.Component {
     title: "Forgot Password"
   };
 
-  showAlert = () => {
+  showAlert = (title, msg) => {
     this.setState({
-      showAlert: true
+      showAlert: true,
+      errortitle: title,
+      errormessage: msg
     });
   };
 
@@ -99,7 +101,7 @@ export default class SignInScreen extends React.Component {
               closeOnHardwareBackPress={true}
               showCancelButton={true}
               showConfirmButton={false}
-              cancelText="Try again"
+              cancelText={this.state.errortitle === 'Succces' ? "Close" : "Try again"}
               confirmText=""
               confirmButtonColor="#DD6B55"
               overlayStyle={{ backgroundColor: "#0000" }}
@@ -122,14 +124,18 @@ export default class SignInScreen extends React.Component {
     this.setState({ Loader: !this.state.Loader })
     await fetch('http://3.84.100.107/users/passwords', {
       method: "POST",
-      headers: {},
+      headers: {
+      },
       body: JSON.stringify({
         email: this.state.userEmail,
       })
     })
-      .then(response => response.json())
+      .then(response => {
+        return response.json()
+      })
+
       .then(responseJson => {
-        if (responseJson["status"] == 'success') {
+        if (responseJson.success) {
           this.setState({
             Loader: !this.state.Loader,
             errormessage: responseJson['message'],
@@ -137,13 +143,15 @@ export default class SignInScreen extends React.Component {
             signup_success: "true"
           });
 
-          this.showAlert();
-          this.props.navigation.navigate("Sign-in");
+          this.showAlert("Success", responseJson['message']);
+          setInterval(() => {
+            // this.props.navigation.navigate("Auth");
+          }, 1000)
         } else {
           this.setState({
             Loader: !this.state.Loader
           })
-          this.showAlert();
+          this.showAlert('error', 'something Went Wrong');
         }
       })
       .catch(error => {

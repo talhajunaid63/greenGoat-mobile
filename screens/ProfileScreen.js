@@ -43,7 +43,7 @@ export default class ProfileScreen extends React.Component {
     console.log(await AsyncStorage.getItem("userToken"))
     console.log(await AsyncStorage.getItem("client"))
 
-    this.renderMyData();  
+    this.renderMyData();
   }
 
   setModalVisible(visible) {
@@ -61,15 +61,17 @@ export default class ProfileScreen extends React.Component {
       }
     })
       .then(response => {
-
+        debugger
         if (response.status !== 200) {
-          response.text().then((res) => {
+          debugger
+          return response.text().then((res) => {
             console.log(res)
           })
 
         }
         else {
-          response.json()
+          debugger
+          return response.json()
         }
       }
       )

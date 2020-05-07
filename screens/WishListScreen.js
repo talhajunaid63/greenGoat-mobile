@@ -1,10 +1,12 @@
 import React from "react";
-import { ActivityIndicator, Alert, AsyncStorage, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, AsyncStorage, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View, KeyboardAvoidingView } from "react-native";
 import { CreditCardInput } from "react-native-credit-card-input";
 import { Button, Header, Icon, Input } from "react-native-elements";
 import ImageSlider from "react-native-image-slider";
 import back from "../assets/images/back.png";
 import { BASE_URL } from "../config/NetworkConstants";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
 
 export default class WishListScreen extends React.Component {
   constructor(props) {
@@ -49,13 +51,13 @@ export default class WishListScreen extends React.Component {
     this.focusListener = navigation.addListener("didFocus", () => {
 
     });
-      this.renderMyData();
+    this.renderMyData();
   }
 
 
 
   async renderMyData() {
-    fetch(BASE_URL+"favourites", {
+    fetch(BASE_URL + "favourites", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -102,7 +104,7 @@ export default class WishListScreen extends React.Component {
   };
 
   remove_from_wishlist = async product_id => {
-    fetch(BASE_URL+"favourites/remove-from-favourite", {
+    fetch(BASE_URL + "favourites/remove-from-favourite", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -118,8 +120,8 @@ export default class WishListScreen extends React.Component {
       .then(response => response.json())
       .then(responseJson => {
 
-        this.renderMyData();
         Alert.alert("Product removed from wish list");
+        this.renderMyData();
       })
 
       .catch(error => {
@@ -178,7 +180,7 @@ export default class WishListScreen extends React.Component {
           animationType="slide"
           transparent={false}
           visible={this.state.addMoreModalVisible}
-          onRequestClose={() => {}}
+          onRequestClose={() => { }}
         >
           <View style={{ backgroundColor: "white", flex: 1 }}>
             <View
@@ -225,37 +227,40 @@ export default class WishListScreen extends React.Component {
               </View>
             </View>
             <View style={{ marginTop: 40 }}>
-              <View style={styles.paragraph}>
-                <Text>Name</Text>
-                <Input
-                  onChangeText={text => this.setState({ Name: text })}
-                  placeholder="Name"
-                  value={this.state.Name}
-                />
-              </View>
-              <View style={styles.paragraph}>
-                <Text>Dimentions</Text>
-                <Input
-                  placeholder="Dimentions"
-                  onChangeText={text => this.setState({ Dimentions: text })}
-                  value={this.state.Dimentions}
-                />
-              </View>
-              <View style={styles.paragraph}>
-                <Text>Description</Text>
-                <Input
-                  onChangeText={text => this.setState({ Description: text })}
-                  placeholder="Description"
-                  value={this.state.Description}
-                />
-              </View>
-              <View style={styles.paragraph}>
-                <Button
-                  title="Add to Wishlist"
-                  buttonStyle={{ backgroundColor: "#089D37" }}
-                  onPress={() => {}}
-                />
-              </View>
+              <KeyboardAwareScrollView enableOnAndroid={true}>
+
+                <View style={styles.paragraph}>
+                  <Text>Name</Text>
+                  <Input
+                    onChangeText={text => this.setState({ Name: text })}
+                    placeholder="Name"
+                    value={this.state.Name}
+                  />
+                </View>
+                <View style={styles.paragraph}>
+                  <Text>Dimentions</Text>
+                  <Input
+                    placeholder="Dimentions"
+                    onChangeText={text => this.setState({ Dimentions: text })}
+                    value={this.state.Dimentions}
+                  />
+                </View>
+                <View style={styles.paragraph}>
+                  <Text>Description</Text>
+                  <Input
+                    onChangeText={text => this.setState({ Description: text })}
+                    placeholder="Description"
+                    value={this.state.Description}
+                  />
+                </View>
+                <View style={styles.paragraph}>
+                  <Button
+                    title="Add to Wishlist"
+                    buttonStyle={{ backgroundColor: "#089D37" }}
+                    onPress={() => { }}
+                  />
+                </View>
+              </KeyboardAwareScrollView>
             </View>
           </View>
         </Modal>
@@ -264,7 +269,7 @@ export default class WishListScreen extends React.Component {
           animationType="slide"
           transparent={false}
           visible={this.state.modalVisible}
-          onRequestClose={() => {}}
+          onRequestClose={() => { }}
         >
           <View style={{ backgroundColor: "#8deb73", flex: 1 }}>
             <View
@@ -343,12 +348,12 @@ export default class WishListScreen extends React.Component {
             return item.id;
           }}
           ListEmptyComponent={() => {
-              return( <View style={styles.emptyContainer} >
-                      <Text style={{fontSize:20, fontWeight:"bold", paddingHorizontal:20, marginTop:20}}>
-                          There are no favourite items
+            return (<View style={styles.emptyContainer} >
+              <Text style={{ fontSize: 20, fontWeight: "bold", paddingHorizontal: 20, marginTop: 20 }}>
+                There are no favourite items
                       </Text>
-                  </View>
-              )
+            </View>
+            )
 
           }}
           ItemSeparatorComponent={() => {
@@ -480,10 +485,10 @@ const styles = StyleSheet.create({
   separator: {
     marginTop: 10
   },
-    emptyContainer:{
-        justifyContent:"center",
-        alignItems:"center",
-    },
+  emptyContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
   /******** card **************/
   card: {
     shadowOffset: { width: 10, height: 10 },
