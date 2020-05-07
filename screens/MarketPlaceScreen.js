@@ -1,38 +1,13 @@
+import { Tab, Tabs } from "native-base";
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  Alert,
-  ScrollView,
-  FlatList,
-  Modal,
-  TouchableHighlight,
-  Picker,
-  AsyncStorage,
-  ActivityIndicator
-} from "react-native";
-import {
-  Card,
-  ListItem,
-  Button,
-  Icon,
-  Input,
-  SearchBar,
-  Slider
-} from "react-native-elements";
-import {
-  CreditCardInput,
-  LiteCreditCardInput
-} from "react-native-credit-card-input";
+import { ActivityIndicator, Alert, AsyncStorage, FlatList, Image, Modal, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from "react-native";
+import { CreditCardInput } from "react-native-credit-card-input";
+import { Button, Icon, SearchBar, Slider } from "react-native-elements";
 import ImageSlider from "react-native-image-slider";
-import { Tab, Tabs, TabHeading } from "native-base";
-import filterr from "../assets/images/filterr.png";
-import back from "../assets/images/back.png";
 import { Dropdown } from "react-native-material-dropdown";
-import {BASE_URL} from "../config/NetworkConstants";
+import back from "../assets/images/back.png";
+import filterr from "../assets/images/filterr.png";
+import { BASE_URL } from "../config/NetworkConstants";
 
 // import MultiSlider from "@ptomasroos/react-native-multi-slider";
 export default class MarketPlaceScreen extends React.Component {
@@ -138,14 +113,14 @@ export default class MarketPlaceScreen extends React.Component {
   }
 
   async renderMyData() {
-    if(this.state.categoryid!==-1 && this.state.maxvalue!=-1) {
+    if (this.state.categoryid !== -1 && this.state.maxvalue != -1) {
       var url = BASE_URL + `products?q[category_id]=${this.state.categoryid}&q[min_price]=${this.state.minvalue}&q[max_price]=${this.state.maxvalue}`;
     }
-    else if(this.state.categoryid!=-1){
+    else if (this.state.categoryid != -1) {
       var url = BASE_URL + `products?q[category_id]=${this.state.categoryid}`;
 
     }
-    else if(this.state.maxvalue!=-1){
+    else if (this.state.maxvalue != -1) {
       var url = BASE_URL + `products?q[min_price]=${this.state.minvalue}&q[max_price]=${this.state.maxvalue}`;
 
     }
@@ -153,8 +128,7 @@ export default class MarketPlaceScreen extends React.Component {
       var url = BASE_URL + "products";
 
     }
-  console.log("Url before:",url);
-//    url = url.substring(0, url.length - 1);
+    //    url = url.substring(0, url.length - 1);
 
     // url.searchParams.append(data);
 
@@ -173,7 +147,6 @@ export default class MarketPlaceScreen extends React.Component {
     // );
 
     // url.search = new URLSearchParams(data).toString();
-    console.log("url", url);
     fetch(url, {
       method: "GET",
       headers: {
@@ -186,7 +159,6 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        console.log("ResponseJson:",responseJson);
         // this.setState({ name : responseJson["name"] })
         // this.setState({ email : responseJson["email"] })
         this.get_group_items();
@@ -202,7 +174,7 @@ export default class MarketPlaceScreen extends React.Component {
   }
 
   async get_group_items() {
-    var url = new URL(BASE_URL+"group_items");
+    var url = new URL(BASE_URL + "group_items");
     var params = [
       ["q[price_gteq]", this.state.minvalue],
       ["q[price_lteq]", this.state.maxvalue]
@@ -221,13 +193,10 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        // this.setState({ name : responseJson["name"] })
-        // this.setState({ email : responseJson["email"] })
         this.setState({
           group_items: responseJson,
           backup_data_group: responseJson
         });
-        // console.log(responseJson[0]['images'])
       })
       .catch(error => {
         console.log(error);
@@ -235,7 +204,7 @@ export default class MarketPlaceScreen extends React.Component {
   }
 
   async get_categories_data() {
-    var url = new URL(BASE_URL+"/products/categories");
+    var url = new URL(BASE_URL + "/products/categories");
 
     fetch(url, {
       method: "GET",
@@ -248,7 +217,6 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        console.log("Products Categories Response:",responseJson);
         let catData = [];
         responseJson.categories.map(cat => {
           catData.push({ value: cat.name, id: cat.id });
@@ -285,8 +253,8 @@ export default class MarketPlaceScreen extends React.Component {
     this.setState({ filtermodalVisible: !this.state.filtermodalVisible });
     data = this.state.backup_data;
     data_group = this.state.backup_data_group;
-    if(this.state.categoryid===-1){
-      this.state.categoryid=1;
+    if (this.state.categoryid === -1) {
+      this.state.categoryid = 1;
     }
     this.renderMyData();
 
@@ -334,7 +302,7 @@ export default class MarketPlaceScreen extends React.Component {
   };
 
   add_to_wishlist = async item => {
-    fetch(BASE_URL+"favourites/add-to-favourite", {
+    fetch(BASE_URL + "favourites/add-to-favourite", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -350,7 +318,6 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        console.log(responseJson);
         Alert.alert("Product added to favourite list");
       })
 
@@ -369,13 +336,8 @@ export default class MarketPlaceScreen extends React.Component {
     });
     this.setState({ category: vall, categoryid: selectedid });
   };
-  getPaymentDone=async (token)=>{
-
-    console.log("Token:",await AsyncStorage.getItem("userToken"));
-    console.log("UID:",await AsyncStorage.getItem("uid"));
-    console.log("client:",await AsyncStorage.getItem("uid"));
-    console.log("Base_url:",BASE_URL+"orders");
-    fetch(BASE_URL+"orders", {
+  getPaymentDone = async (token) => {
+    fetch(BASE_URL + "orders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -384,30 +346,29 @@ export default class MarketPlaceScreen extends React.Component {
         client: await AsyncStorage.getItem("client")
       },
       body: JSON.stringify({
-            "order": {
-              "amount": this.selectedItem.price,
-              "token": token,
-              "order_type": "item",
-              "id": this.selectedItem.id
-            }
-          }
+        "order": {
+          "amount": this.selectedItem.price,
+          "token": token,
+          "order_type": "item",
+          "id": this.selectedItem.id
+        }
+      }
       )
     })
-        .then(response => response.json())
-        .then(responseJson => {
-          console.log("ResponseJson payment:",responseJson);
-          if(responseJson.message){
-            Alert.alert(responseJson.message)
-          }
+      .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson.message) {
+          Alert.alert(responseJson.message)
+        }
 
-        })
+      })
 
-        .catch(error => {
-          console.log(error);
-        });
+      .catch(error => {
+        console.log(error);
+      });
   };
   getCreditCardToken = () => {
-    if(this.state.expiry!=null && this.state.number !=null) {
+    if (this.state.expiry != null && this.state.number != null) {
       let expiry = this.state.expiry.split("/")
 
       const card = {
@@ -432,11 +393,10 @@ export default class MarketPlaceScreen extends React.Component {
         // Format the credit card data to a string of key-value pairs
         // divided by &
         body: Object.keys(card)
-            .map(key => key + '=' + card[key])
-            .join('&')
-      }).then(response =>response.json()).then((jsonRespone)=>{
-        console.log("jsonRespone",jsonRespone)
-        if(jsonRespone.id!=null) {
+          .map(key => key + '=' + card[key])
+          .join('&')
+      }).then(response => response.json()).then((jsonRespone) => {
+        if (jsonRespone.id != null) {
           this.getPaymentDone(jsonRespone.id)
         }
       }).catch((error => {
@@ -446,20 +406,19 @@ export default class MarketPlaceScreen extends React.Component {
   };
   _onCardChange = form => {
     // console.log(form);
-    console.log("card form:",form)
 
 
-      console.log("card valid:",this.state)
-      this.setState({ buy_button_disabled: false });
-      this.setState({ number: form["values"]["number"] });
-      this.setState({ cvc: form["values"]["cvc"] });
-      this.setState({ expiry: form["values"]["expiry"] });
+    this.setState({
+      buy_button_disabled: false,
+      number: form["values"]["number"],
+      cvc: form["values"]["cvc"],
+      expiry: form["values"]["expiry"]
+    });
 
   };
 
-  buyNowItem(item){
-    console.log("item:",item)
-    this.selectedItem=item
+  buyNowItem(item) {
+    this.selectedItem = item
     this.setModalVisible(true)
   }
   render() {
@@ -469,7 +428,7 @@ export default class MarketPlaceScreen extends React.Component {
           animationType="slide"
           transparent={false}
           visible={this.state.modalVisible}
-          onRequestClose={() => {}}
+          onRequestClose={() => { }}
         >
           <View style={{ backgroundColor: "#8deb73", flex: 1 }}>
             <View
@@ -550,7 +509,7 @@ export default class MarketPlaceScreen extends React.Component {
           animationType="slide"
           transparent={this.state.modalVisible}
           visible={this.state.filtermodalVisible}
-          onRequestClose={() => {}}
+          onRequestClose={() => { }}
         >
           <View style={styles.filterModal}>
             <Text
@@ -866,7 +825,6 @@ export default class MarketPlaceScreen extends React.Component {
                   );
                 }
                 const item = post.item;
-                console.log("ppp", post);
                 return (
                   <View style={styles.cardGroup}>
                     <ImageSlider

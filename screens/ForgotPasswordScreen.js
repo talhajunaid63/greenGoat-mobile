@@ -1,5 +1,5 @@
 import React from "react";
-import { AsyncStorage, Image, ImageBackground, StyleSheet, View } from "react-native";
+import { Image, ImageBackground, StyleSheet, View } from "react-native";
 import AwesomeAlert from "react-native-awesome-alerts";
 import { Button, Input } from "react-native-elements";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -11,15 +11,16 @@ export default class SignInScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
-      password: "",
+      userEmail: "",
       showAlert: false,
-      progress: false,
-      Loader: false
+      Loader: false,
+      errortitle: "Failed",
+      errormessage: 'Something went wrong',
+      signup_success: "false",
     };
   }
   static navigationOptions = {
-    title: "Please sign in"
+    title: "Forgot Password"
   };
 
   showAlert = () => {
@@ -44,12 +45,12 @@ export default class SignInScreen extends React.Component {
       >
         <KeyboardAwareScrollView enableOnAndroid={true}>
           <View>
+            {this.state.Loader === true && (
+              <View style={{ justifyContent: "center", alignItems: "center" }}>
+                <Loader LoaderVisibles={this.state.Loader} />
+              </View>
+            )}
             <View style={styles.sign_in_page}>
-              {this.state.Loader === true && (
-                <View style={{ justifyContent: "center", alignItems: "center" }}>
-                  <Loader LoaderVisibles={this.state.Loader} />
-                </View>
-              )}
               <Image
                 style={{ width: 220, height: 160 }}
                 source={require("../assets/images/logo.png")}
@@ -68,50 +69,32 @@ export default class SignInScreen extends React.Component {
                   style={styles.input_style}
                   inputStyle={{ marginLeft: 16 }}
                   inputContainerStyle={{ borderBottomColor: "#d9d9e0" }}
-                  onChangeText={text => this.setState({ username: text })}
+                  onChangeText={text => this.setState({ useremail: text })}
                   autoCapitalize="none"
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
-                <Input
-                  placeholder="Password"
-                  placeholderTextColor="#7777775c"
-                  leftIcon={{
-                    type: "font-awesome",
-                    name: "key",
-                    color: "#5EA64A"
-                  }}
-                  style={styles.input_style}
-                  inputStyle={{ marginLeft: 15 }}
-                  inputContainerStyle={{ borderBottomColor: "#d9d9e0" }}
-                  onChangeText={text => this.setState({ password: text })}
-                  secureTextEntry={true}
                 />
               </View>
               <View style={styles.container}>
                 <Button
                   buttonStyle={styles.button}
-                  title="Login"
+                  title="Submit"
                   titleStyle={{ fontSize: 28, size: 28 }}
                   raised={true}
-                  onPress={this.LoginApi}
+                  onPress={this.ForgotApi}
                 />
-              </View>
-              <View style={styles.inputContainer}>
+
                 <Button
-                  title="Don’t Have an Account? Sign up here"
                   type="clear"
                   titleStyle={{ color: "#5EA64A" }}
-                  onPress={() => this.props.navigation.navigate("SignUp")}
+                  title="Back To Sign In"
+                  onPress={() => this.props.navigation.navigate("Auth")}
                 />
               </View>
             </View>
             <AwesomeAlert
               show={this.state.showAlert}
               showProgress={false}
-              title="Error"
-              message="Wrong email or password"
+              title={this.state.errortitle}
+              message={this.state.errormessage}
               closeOnTouchOutside={false}
               closeOnHardwareBackPress={true}
               showCancelButton={true}
@@ -128,74 +111,43 @@ export default class SignInScreen extends React.Component {
               }}
             />
           </View>
-          <Button
-            title="Forgot Password"
-            type="clear"
-            titleStyle={{ color: "#5EA64A" }}
-            onPress={() => this.props.navigation.navigate("ForgotPassword")}
-          />
         </KeyboardAwareScrollView>
       </ImageBackground>
     );
   }
-  _signInAsync = async () => {
-    await AsyncStorage.setItem("userToken", "abc");
-    this.props.navigation.navigate("Main");
-  };
 
-  LoginApi = async () => {
+
+  ForgotApi = async () => {
     var success = false;
     this.setState({ Loader: !this.state.Loader })
-    fetch(BASE_URL + "auth/sign_in", {
+    await fetch('http://3.84.100.107/users/passwords', {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: {},
       body: JSON.stringify({
-        email: this.state.username,
-        password: this.state.password
+        email: this.state.userEmail,
       })
     })
-      .then(response => {
-        if (response.headers.get("access-token")) {
-          console.log("kjnsjknxsjk", response);
-          AsyncStorage.setItem(
-            "userToken",
-            response.headers.get("access-token")
-          );
-          AsyncStorage.setItem("uid", response.headers.get("uid"));
-          AsyncStorage.setItem("client", response.headers.get("client"));
-          success = true;
+      .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson["status"] == 'success') {
+          this.setState({
+            Loader: !this.state.Loader,
+            errormessage: responseJson['message'],
+            errortitle: "Success",
+            signup_success: "true"
+          });
+
+          this.showAlert();
+          this.props.navigation.navigate("Sign-in");
         } else {
-          this.setState({ Loader: !this.state.Loader })
+          this.setState({
+            Loader: !this.state.Loader
+          })
           this.showAlert();
         }
-        return response.json();
       })
-      .then(responseJson => {
-        if (success == true) {
-          AsyncStorage.setItem(
-            "user_name",
-            (
-              responseJson["data"]["firstname"] +
-              responseJson["data"]["lastname"]
-            ).toString()
-          );
-          AsyncStorage.setItem(
-            "user_email",
-            responseJson["data"]["email"].toString()
-          );
-          AsyncStorage.setItem(
-            "user_id",
-            responseJson["data"]["id"].toString()
-          );
-          this.setState({ Loader: !this.state.Loader })
-          this.props.navigation.navigate("Main");
-        }
-      })
-
       .catch(error => {
-        console.error(error);
+        console.error(error, 'errrrprrrr');
       });
   };
 }

@@ -1,26 +1,11 @@
 import React, { Component } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  TouchableHighlight,
-  ScrollView,
-  Modal,
-  AsyncStorage,
-  Alert
-} from "react-native";
-
-import ReactNativeSettingsPage, {
-  SectionRow,
-  SwitchRow,
-  CheckRow
-} from "react-native-settings-page";
-
-import { Icon, Header, Input, Button } from "react-native-elements";
+import { Alert, AsyncStorage, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Header, Icon, Input } from "react-native-elements";
+import ReactNativeSettingsPage, { SectionRow, SwitchRow } from "react-native-settings-page";
 import back from "../assets/images/back.png";
-import {BASE_URL} from "../config/NetworkConstants";
+import { BASE_URL } from "../config/NetworkConstants";
+
+
 
 export default class SettingsScreen extends Component {
   constructor(props) {

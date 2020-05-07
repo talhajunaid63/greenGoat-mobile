@@ -1,13 +1,10 @@
+
 import React from 'react';
-import {
-    StyleSheet, Text, View, Image, ImageBackground, ActivityIndicator,
-    AsyncStorage, Alert,
-} from 'react-native';
+import { ActivityIndicator, AsyncStorage, ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { SliderBox } from "react-native-image-slider-box";
-import {BASE_URL} from "../config/NetworkConstants";
-
-import Global from "../config/GlobalState"
+import Global from "../config/GlobalState";
+import { BASE_URL } from "../config/NetworkConstants";
 
 export default class HomeScreen extends React.Component {
     constructor(props) {
@@ -17,19 +14,35 @@ export default class HomeScreen extends React.Component {
 
             ],
             progress: true,
-          };
+        };
 
-      }
+    }
 
 
+    // getPushNotificationPermissions = async () => {
+    //     const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    //     let finalStatus = existingStatus;
+    //
+    //     // only ask if permissions have not already been determined, because
+    //     // iOS won't necessarily prompt the user a second time.
+    //     if (existingStatus !== 'granted') {
+    //         // Android remote notification permissions are granted during the app
+    //         // install, so this will only ask on iOS
+    //         const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+    //         finalStatus = status;
+    //     }
+    //
+    //     // Stop here if the user did not grant permissions
+    //     if (finalStatus !== 'granted') {
+    //         return;
+    //     }
+    //
+    //     // Get the token that uniquely identifies this device
+    //     console.log("Notification Token: ", await Notifications.getExpoPushTokenAsync());
+    // }
+    async remove_from_wishlist() {
 
-   async remove_from_wishlist() {
-
-        console.log("Token:",await AsyncStorage.getItem("userToken"));
-       console.log("UID:",await AsyncStorage.getItem("uid"));
-       console.log("client:",await AsyncStorage.getItem("uid"));
-        console.log("Base_url:",BASE_URL+"checkout?");
-        fetch(BASE_URL+"checkout", {
+        fetch(BASE_URL + "checkout", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -38,17 +51,16 @@ export default class HomeScreen extends React.Component {
                 client: await AsyncStorage.getItem("client")
             },
             body: JSON.stringify({
-                    "price": 1400,
-                    "number": 1234555567822129,
-                    "expiry": "12/20",
-                    "item_type": "item",
-                    "id": 1
-                }
+                "price": 1400,
+                "number": 1234555567822129,
+                "expiry": "12/20",
+                "item_type": "item",
+                "id": 1
+            }
             )
         })
             .then(response => response.json())
             .then(responseJson => {
-                 console.log("ResponseJson:",responseJson);
             })
 
             .catch(error => {
@@ -56,13 +68,9 @@ export default class HomeScreen extends React.Component {
             });
     };
 
-    getPaymentDone=async (token)=>{
+    getPaymentDone = async (token) => {
 
-        console.log("Token:",await AsyncStorage.getItem("userToken"));
-        console.log("UID:",await AsyncStorage.getItem("uid"));
-        console.log("client:",await AsyncStorage.getItem("uid"));
-        console.log("Base_url:",BASE_URL+"orders");
-        fetch(BASE_URL+"orders", {
+        fetch(BASE_URL + "orders", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -77,16 +85,15 @@ export default class HomeScreen extends React.Component {
                     "order_type": "item",
                     "id": "9"
                 }
-                }
+            }
             )
         })
             .then(response => {
-                console.log("response123:",response)
 
-            console.log("response.json in payment",response.json())
+                response.json()
             })
             .then(responseJson => {
-                console.log("ResponseJson payment:",responseJson);
+
             })
 
             .catch(error => {
@@ -94,16 +101,15 @@ export default class HomeScreen extends React.Component {
             });
     };
 
-     getCreditCardToken = () => {
-         console.log("caling:","home")
-         const card = {
-             'card[number]': "4242424242424242",
-             'card[exp_month]': "01",
-             'card[exp_year]': "23",
-             'card[cvc]': 328
-         };
+    getCreditCardToken = () => {
+        const card = {
+            'card[number]': "4242424242424242",
+            'card[exp_month]': "01",
+            'card[exp_year]': "23",
+            'card[cvc]': 328
+        };
 
-         let STRIPE_PUBLISHABLE_KEY='pk_test_x7BQNZlks7cWynfPFdrXSnDs'
+        let STRIPE_PUBLISHABLE_KEY = 'pk_test_x7BQNZlks7cWynfPFdrXSnDs'
         return fetch('https://api.stripe.com/v1/tokens', {
             headers: {
                 // Use the correct MIME type for your server
@@ -120,137 +126,133 @@ export default class HomeScreen extends React.Component {
             body: Object.keys(card)
                 .map(key => key + '=' + card[key])
                 .join('&')
-        }).then(response =>{
-            console.log("respons:",response)
-            console.log("in response",response.json())
-        }).catch((error=>{
-            console.log("error i  payment:",error)
+        }).then(response => {
+            response.json()
+        }).catch((error => {
+            console.log("error i  payment:", error)
         }));
     };
 
-     async getName(){
-         let name=await AsyncStorage.getItem("user_name")
-         console.log("Name:",name)
-         Global.username=name
-     }
+    async getName() {
+        let name = await AsyncStorage.getItem("user_name")
+        Global.username = name
+    }
     componentDidMount() {
         //this.remove_from_wishlist();
-
-       // let data=this.getCreditCardToken()
+        //this.getPushNotificationPermissions();
+        // let data=this.getCreditCardToken()
         this.getPaymentDone()
-       // console.log("data:",data)
+        // console.log("data:",data)
 
-            this.getName()
-        }
+        this.getName()
+    }
 
     componentWillMount() {
-       // this.renderMyData();
-      }
+        // this.renderMyData();
+    }
 
-      async renderMyData(){
-        fetch(BASE_URL+'home_images', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        })
-        .then((response) => {
-        console.log("response before jsons:",response)
-            response.json()
-        })
-        .then((responseJson) => {
-            console.log("responseJson",responseJson)
-            if(responseJson!==null && responseJson!==undefined) {
-                this.setState({images: responseJson, progress: true})
-            }
-            else{
-                this.setState({ progress: true})
+    async renderMyData() {
+        fetch(BASE_URL + 'home_images', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
             }
         })
-        .catch((error) => {
-        console.error(error);
-        });
-      }
+            .then((response) => {
+                response.json()
+            })
+            .then((responseJson) => {
+                if (responseJson !== null && responseJson !== undefined) {
+                    this.setState({ images: responseJson, progress: true })
+                }
+                else {
+                    this.setState({ progress: true })
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
     static navigationOptions = {
-      title: 'HomeScreen',
+        title: 'HomeScreen',
     };
     render() {
-    if (this.state.progress == false){
-        return (
-            <View style={{marginTop: 200}}>
-            <ActivityIndicator size="large" color="#00ff00" />
-            </View>
+        if (this.state.progress == false) {
+            return (
+                <View style={{ marginTop: 200 }}>
+                    <ActivityIndicator size="large" color="#00ff00" />
+                </View>
             )
         }
-      const {navigate} = this.props.navigation;
-      return (
-        <ImageBackground source={require('../assets/images/background.png')} style={{width: '100%', height: '100%'}}>
-            <View style={styles.container}>
-                <View style={styles.home_slider}>
-                <SliderBox
-                    images={this.state.images}
-                    autoplay
-                    circleLoop
-                    />
-                </View>
+        const { navigate } = this.props.navigation;
+        return (
+            <ImageBackground source={require('../assets/images/background.png')} style={{ width: '100%', height: '100%' }}>
+                <View style={styles.container}>
+                    <View style={styles.home_slider}>
+                        <SliderBox
+                            images={this.state.images}
+                            autoplay
+                            circleLoop
+                        />
+                    </View>
 
-                <View style={styles.home_button}>
-                    <View style={{ marginBottom: 20 }}>
-                        <Text style={{ color: "white", textAlign: "center", fontSize: 20 }}>
-                            To get an estimate of your materials and their value, we'll use the
-                            greenGoat database to get you some numbers. Ready?
+                    <View style={styles.home_button}>
+                        <View style={{ marginBottom: 20 }}>
+                            <Text style={{ color: "white", textAlign: "center", fontSize: 20 }}>
+                                To get an estimate of your materials and their value, we'll use the
+                                greenGoat database to get you some numbers. Ready?
                         </Text>
+                        </View>
+                        <Button
+                            buttonStyle={styles.button}
+                            title="What's My Stuff Worth?"
+                            titleStyle={{ fontSize: 20 }}
+                            raised={true}
+                            onPress={() => this.props.navigation.navigate('Donation')}
+                        />
+                        <View style={{ marginVertical: 10 }}>
+                            <Button
+                                buttonStyle={styles.button}
+                                title="Marketplace"
+                                titleStyle={{ fontSize: 20 }}
+                                raised={true}
+                                onPress={() => this.props.navigation.navigate('MarketPlace')}
+                            />
+                        </View>
+                        <Button
+                            buttonStyle={styles.button}
+                            title="Activities"
+                            titleStyle={{ fontSize: 20 }}
+                            raised={true}
+                            onPress={() => this.props.navigation.navigate('Donation')}
+                        />
                     </View>
-                    <Button
-                    buttonStyle={styles.button}
-                    title= "What's My Stuff Worth?"
-                    titleStyle={{fontSize: 20}}
-                    raised= {true}
-                    onPress={() => this.props.navigation.navigate('Donation')}
-                    />
-                    <View style={{marginVertical:10}}>
-                    <Button
-                        buttonStyle={styles.button}
-                        title= "Marketplace"
-                        titleStyle={{fontSize: 20}}
-                        raised= {true}
-                        onPress={() => this.props.navigation.navigate('MarketPlace')}
-                    />
-                    </View>
-                    <Button
-                        buttonStyle={styles.button}
-                        title= "Activities"
-                        titleStyle={{fontSize: 20}}
-                        raised= {true}
-                        onPress={() => this.props.navigation.navigate('Donation')}
-                    />
                 </View>
-            </View>
-        </ImageBackground>
+            </ImageBackground>
 
-      );
+        );
     }
-  }
+}
 
-  const styles = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         flex: 1,
-      },
+    },
 
-      home_button: {
+    home_button: {
         marginTop: 30,
-          padding:10,
+        padding: 10,
         flex: 1,
         alignItems: 'center',
-    justifyContent: 'center'
-      },
+        justifyContent: 'center'
+    },
 
-      button: {
+    button: {
         backgroundColor: '#5EA64A',
         width: 300,
 
-      },
-      home_slider:{
+    },
+    home_slider: {
         marginTop: 150,
-      },
-  })
+    },
+})

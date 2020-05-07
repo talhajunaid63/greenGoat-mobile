@@ -1,25 +1,12 @@
-import React from "react";
-import {
-    StyleSheet,
-    Text,
-    View,
-    Image,
-    TouchableOpacity,
-    AsyncStorage,
-    Alert,
-    Modal,
-    TouchableHighlight,
-    Picker,
-    ScrollView,
-    ActivityIndicator, Linking
-} from "react-native";
-import UserAvatar from "react-native-user-avatar";
-import {Avatar, Input, Button, Header} from "react-native-elements";
-import DatePicker from "react-native-datepicker";
-
 import { Icon } from "native-base";
+import React from "react";
+import { ActivityIndicator, Alert, AsyncStorage, Image, Modal, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from "react-native";
+import DatePicker from "react-native-datepicker";
+import { Avatar, Button, Header, Input } from "react-native-elements";
+import UserAvatar from "react-native-user-avatar";
 import back from "../assets/images/back.png";
-import {BASE_URL} from "../config/NetworkConstants";
+import { BASE_URL } from "../config/NetworkConstants";
+
 
 export default class ProfileScreen extends React.Component {
   constructor(props) {
@@ -52,8 +39,11 @@ export default class ProfileScreen extends React.Component {
     });
   }
 
-  componentWillMount() {
-    this.renderMyData();
+  async  componentWillMount() {
+    console.log(await AsyncStorage.getItem("userToken"))
+    console.log(await AsyncStorage.getItem("client"))
+
+    this.renderMyData();  
   }
 
   setModalVisible(visible) {
@@ -61,7 +51,7 @@ export default class ProfileScreen extends React.Component {
   }
 
   async renderMyData() {
-    fetch(BASE_URL+"myprofile", {
+    fetch(BASE_URL + "myprofile", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -70,22 +60,36 @@ export default class ProfileScreen extends React.Component {
         client: await AsyncStorage.getItem("client")
       }
     })
-      .then(response => response.json())
+      .then(response => {
+
+        if (response.status !== 200) {
+          response.text().then((res) => {
+            console.log(res)
+          })
+
+        }
+        else {
+          response.json()
+        }
+      }
+      )
       .then(responseJson => {
-          console.log("ResponseJson:",responseJson);
-        this.setState({ progress: true });
-        this.setState({ firstname: responseJson["firstname"] });
-        this.setState({ lastname: responseJson["lastname"] });
-        this.setState({ email: responseJson["email"] });
-        this.setState({ image: responseJson["image"] });
-        this.setState({ address1: responseJson["address1"] });
-        this.setState({ address2: responseJson["address2"] });
-        this.setState({ city: responseJson["city"] });
-        this.setState({ state: responseJson["state"] });
-        this.setState({ zip: responseJson["zip"] });
-        this.setState({ dob: responseJson["dob"] });
-          this.setState({ phone_type: responseJson["phone_type"] });
-        this.setState({ phone: responseJson["phone"].toString() });
+        debugger
+        console.log(responseJson, 'essssssssssssssssssssssss')
+        this.setState({
+          progress: true,
+          firstname: responseJson["firstname"],
+          lastname: responseJson["lastname"],
+          email: responseJson["email"],
+          image: responseJson["image"],
+          address1: responseJson["address1"],
+          address2: responseJson["address2"],
+          city: responseJson["city"],
+          state: responseJson["state"],
+          zip: responseJson["zip"],
+          dob: responseJson["dob"],
+          phone_type: responseJson["phone_type"], phone: responseJson["phone"].toString()
+        });
       })
       .catch(error => {
         console.error(error);
@@ -93,10 +97,11 @@ export default class ProfileScreen extends React.Component {
   }
 
   update_user = async () => {
-    fetch(BASE_URL+"auth", {
+    fetch(BASE_URL + "auth", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        'Accept': 'application/json, text/plain',
         "access-token": await AsyncStorage.getItem("userToken"),
         uid: await AsyncStorage.getItem("uid"),
         client: await AsyncStorage.getItem("client")
@@ -116,10 +121,9 @@ export default class ProfileScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        console.log(responseJson);
         if (responseJson["status"] == "success") {
-          this.setState({ modalVisible: false },()=>{
-            });
+          this.setState({ modalVisible: false }, () => {
+          });
           this.renderMyData();
         } else {
           Alert.alert(responseJson["errors"].full_messages[0]);
@@ -132,10 +136,11 @@ export default class ProfileScreen extends React.Component {
   };
 
   update_password = async () => {
-    fetch(BASE_URL+"auth/password", {
+    fetch(BASE_URL + "auth/password", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        'Accept': 'application/json, text/plain',
         "access-token": await AsyncStorage.getItem("userToken"),
         uid: await AsyncStorage.getItem("uid"),
         client: await AsyncStorage.getItem("client")
@@ -175,9 +180,9 @@ export default class ProfileScreen extends React.Component {
     }
   }
 
-    updatePhoneType(type){
-      this.setState({phone_type:type})
-    }
+  updatePhoneType(type) {
+    this.setState({ phone_type: type })
+  }
   render() {
     if (this.state.progress == false) {
       return (
@@ -192,26 +197,26 @@ export default class ProfileScreen extends React.Component {
           animationType="slide"
           transparent={false}
           visible={this.state.modalVisible}
-          onRequestClose={() => {}}
+          onRequestClose={() => { }}
         >
-            <Header
-                backgroundColor={"#089D37"}
-                leftComponent={
-                    <TouchableOpacity
-                        onPress={() => {
-                            this.setState({ modalVisible: false });
-                        }}
-                        style={{ width: 25, height: 25 }}
-                    >
-                        <Image source={back} style={{ width: 25, height: 25 }}/>
-                    </TouchableOpacity>
-                }
-
-                centerComponent={{
-                    text: "Update Profile",
-                    style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
+          <Header
+            backgroundColor={"#089D37"}
+            leftComponent={
+              <TouchableOpacity
+                onPress={() => {
+                  this.setState({ modalVisible: false });
                 }}
-            />
+                style={{ width: 25, height: 25 }}
+              >
+                <Image source={back} style={{ width: 25, height: 25 }} />
+              </TouchableOpacity>
+            }
+
+            centerComponent={{
+              text: "Update Profile",
+              style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
+            }}
+          />
           {/*<View*/}
           {/*  style={{*/}
           {/*    width: "100%",*/}
@@ -273,7 +278,7 @@ export default class ProfileScreen extends React.Component {
               />
             </View>
 
-            <View style={[styles.inputContainer,{marginBottom:20}]}>
+            <View style={[styles.inputContainer, { marginBottom: 20 }]}>
               <Input
                 placeholder="Last Name"
                 placeholderTextColor="#7777775c"
@@ -290,24 +295,24 @@ export default class ProfileScreen extends React.Component {
               />
             </View>
 
-              <View style={styles.phone_outer_container_style}>
-                  <TouchableOpacity
-                      onPress={this.updatePhoneType.bind(this,"cell")}
-                      style={styles.phone_container_style}>
-                      <View style={[styles.radio_style,{backgroundColor:this.state.phone_type==="cell"?"#089D37":"white"}]}/>
-                      <Text style={styles.phone_label_style}>
-                          {'Cellphone'}
-                      </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                      onPress={this.updatePhoneType.bind(this,"landline")}
-                      style={styles.phone_container_style}>
-                      <View style={[styles.radio_style,{backgroundColor:this.state.phone_type==="landline"?"#089D37":"white"}]}/>
-                      <Text style={styles.phone_label_style}>
-                          {'Landline'}
-                      </Text>
-                  </TouchableOpacity>
-              </View>
+            <View style={styles.phone_outer_container_style}>
+              <TouchableOpacity
+                onPress={this.updatePhoneType.bind(this, "cell")}
+                style={styles.phone_container_style}>
+                <View style={[styles.radio_style, { backgroundColor: this.state.phone_type === "cell" ? "#089D37" : "white" }]} />
+                <Text style={styles.phone_label_style}>
+                  {'Cellphone'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={this.updatePhoneType.bind(this, "landline")}
+                style={styles.phone_container_style}>
+                <View style={[styles.radio_style, { backgroundColor: this.state.phone_type === "landline" ? "#089D37" : "white" }]} />
+                <Text style={styles.phone_label_style}>
+                  {'Landline'}
+                </Text>
+              </TouchableOpacity>
+            </View>
             <View style={styles.inputContainer}>
               <Input
                 placeholder="Phone"
@@ -467,7 +472,7 @@ export default class ProfileScreen extends React.Component {
           animationType="slide"
           transparent={false}
           visible={this.state.passwordModal}
-          onRequestClose={() => {}}
+          onRequestClose={() => { }}
         >
           <View style={{ backgroundColor: "#8deb73" }}>
             <View style={styles.inputContainer}>
@@ -551,12 +556,12 @@ export default class ProfileScreen extends React.Component {
               {this.state.firstname} {this.state.lastname}
             </Text>
             <Text style={styles.info}>{this.state.email}</Text>
-              {(this.state.address1!=null || this.state.address2!=null ) && <Text style={styles.info}>
-              Address: {this.state.address1?(this.state.address1+","):""} {this.state.address2?(this.state.address2+","):""}{" "}
+            {(this.state.address1 != null || this.state.address2 != null) && <Text style={styles.info}>
+              Address: {this.state.address1 ? (this.state.address1 + ",") : ""} {this.state.address2 ? (this.state.address2 + ",") : ""}{" "}
               {this.state.city} {this.state.state} {this.state.zip}{" "}
             </Text>}
-              {(this.state.address1==null && this.state.address2==null ) && <Text style={styles.info}>
-                  Address: None
+            {(this.state.address1 == null && this.state.address2 == null) && <Text style={styles.info}>
+              Address: None
               </Text>}
 
             <View style={{ marginTop: 30 }}>
@@ -578,22 +583,22 @@ export default class ProfileScreen extends React.Component {
               </TouchableOpacity>               */}
           </View>
         </View>
-          {/*<View style={styles.checkcontainer}>*/}
-          {/*    <TouchableOpacity*/}
-          {/*        onPress={()=>{this.setState({terms:!this.state.terms})}}*/}
-          {/*        style={styles.checkbox_container}>*/}
-          {/*        {this.state.terms===true && <Text>*/}
-          {/*            {'✓'}*/}
-          {/*        </Text>}*/}
-          {/*    </TouchableOpacity>*/}
+        {/*<View style={styles.checkcontainer}>*/}
+        {/*    <TouchableOpacity*/}
+        {/*        onPress={()=>{this.setState({terms:!this.state.terms})}}*/}
+        {/*        style={styles.checkbox_container}>*/}
+        {/*        {this.state.terms===true && <Text>*/}
+        {/*            {'✓'}*/}
+        {/*        </Text>}*/}
+        {/*    </TouchableOpacity>*/}
 
-          {/*    <Text*/}
-          {/*        style={{ color: "#5EA64A", textDecorationLine: "underline" }}*/}
-          {/*        onPress={() => Linking.openURL("https://google.com")}*/}
-          {/*    >*/}
-          {/*        Enable Email Updates*/}
-          {/*    </Text>*/}
-          {/*</View>*/}
+        {/*    <Text*/}
+        {/*        style={{ color: "#5EA64A", textDecorationLine: "underline" }}*/}
+        {/*        onPress={() => Linking.openURL("https://google.com")}*/}
+        {/*    >*/}
+        {/*        Enable Email Updates*/}
+        {/*    </Text>*/}
+        {/*</View>*/}
       </ScrollView>
     );
   }
@@ -658,27 +663,27 @@ const styles = StyleSheet.create({
     color: "#00BFFF",
     marginTop: 10
   },
-    phone_container_style:{
-    flexDirection:"row",
-    alignItems:"center",
-    },
-    phone_outer_container_style:{
-      flexDirection:"row",
-        justifyContent: "space-around",
-        marginBottom:10,
-    },
-    radio_style:{
-      borderRadius:25,
-        height:25,
-        width:25,
-        borderWidth:2,
-        borderColor:"#089D37"
-    },
-    phone_label_style:{
-        fontSize: 16,
-        marginStart:10,
-        color: "black",
-    },
+  phone_container_style: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  phone_outer_container_style: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 10,
+  },
+  radio_style: {
+    borderRadius: 25,
+    height: 25,
+    width: 25,
+    borderWidth: 2,
+    borderColor: "#089D37"
+  },
+  phone_label_style: {
+    fontSize: 16,
+    marginStart: 10,
+    color: "black",
+  },
 
   description: {
     fontSize: 16,
@@ -711,11 +716,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center"
   },
-    checkContainer:{
-      position:"absolute",
-        bottom:30,
-        justifyContent:"center",
-        alignItems:"center",
-        width:"100%",
-    }
+  checkContainer: {
+    position: "absolute",
+    bottom: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+  }
 });

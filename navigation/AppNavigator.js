@@ -1,52 +1,25 @@
+import { Body, Container, Content, Header, Icon, Thumbnail } from "native-base";
 import React from "react";
-import { createAppContainer, createSwitchNavigator } from "react-navigation";
-import MainTabNavigator from "./MainTabNavigator";
-import { createStackNavigator } from "react-navigation-stack";
-import Global from "../config/GlobalState"
-import {
-  createDrawerNavigator,
-  DrawerNavigatorItems,
-
-  DrawerItems
-} from "react-navigation-drawer";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  ImageBackground,
-  ActivityIndicator,
-  AsyncStorage,
-  SafeAreaView,
-    TouchableOpacity,
-
-} from "react-native";
-import { Button, Input } from "react-native-elements";
+import { ActivityIndicator, AsyncStorage, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Button } from "react-native-elements";
 import { getStatusBarHeight } from "react-native-status-bar-height";
-// import Icon from '@expo/vector-icons/Ionicons';
-
-import SignInScreen from "../screens/SignInScreen";
-import SignUpScreen from "../screens/SignUpScreen";
-import ProfileScreen from "../screens/ProfileScreen";
-import WishListScreen from "../screens/WishListScreen";
-import RequestItemScreen from "../screens/RequestItemScreen";
+import { createAppContainer, createSwitchNavigator } from "react-navigation";
+import { createDrawerNavigator, DrawerNavigatorItems } from "react-navigation-drawer";
+import { createStackNavigator } from "react-navigation-stack";
+import Global from "../config/GlobalState";
+import { BASE_URL } from "../config/NetworkConstants";
 import AboutUsScreen from "../screens/AboutUsScreen";
 import ContactUsScreen from "../screens/ContactUsScreen";
-import SettingsScreen from "../screens/SettingsScreen";
+import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import PrivacyPolicyScreen from "../screens/PrivacyPolicyScreen";
+import ProfileScreen from "../screens/ProfileScreen";
+import RequestItemScreen from "../screens/RequestItemScreen";
+import SettingsScreen from "../screens/SettingsScreen";
+import SignInScreen from "../screens/SignInScreen";
+import SignUpScreen from "../screens/SignUpScreen";
+import WishListScreen from "../screens/WishListScreen";
+import MainTabNavigator from "./MainTabNavigator";
 
-import {
-  Container,
-  Header,
-  Left,
-  Body,
-  Right,
-  Title,
-  Content,
-  Icon,
-  Thumbnail
-} from "native-base";
-import {BASE_URL} from "../config/NetworkConstants";
 
 class GetStartedScreen extends React.Component {
   componentWillMount() {
@@ -89,9 +62,9 @@ class GetStartedScreen extends React.Component {
 }
 
 class AuthLoadingScreen extends React.Component {
-  state={
-    firstName:"",
-    lastName:"",
+  state = {
+    firstName: "",
+    lastName: "",
   }
   constructor() {
     super();
@@ -101,7 +74,7 @@ class AuthLoadingScreen extends React.Component {
   }
 
   async renderMyData() {
-    fetch(BASE_URL+"myprofile", {
+    fetch(BASE_URL + "myprofile", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -110,15 +83,14 @@ class AuthLoadingScreen extends React.Component {
         client: await AsyncStorage.getItem("client")
       }
     })
-        .then(response => response.json())
-        .then(responseJson => {
-          console.log("ResponseJson:",responseJson);
-          this.setState({ firstname: responseJson["firstname"],lastname: responseJson["lastname"] });
+      .then(response => response.json())
+      .then(responseJson => {
+        this.setState({ firstname: responseJson["firstname"], lastname: responseJson["lastname"] });
 
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      })
+      .catch(error => {
+        console.error(error);
+      });
   }
   componentDidMount() {
     this.renderMyData();
@@ -169,32 +141,32 @@ DashboardStackNavigator.navigationOptions = {
   drawerIcon: ({ tintColor }) => <Icon name="home" type="FontAwesome" />
 };
 
-const CustomDrawer =  (props) =>{
+const CustomDrawer = (props) => {
 
-    return (
-  <Container>
-    <Header style={{ height: 200, backgroundColor: "#089D37" }}>
-      <Body style={styles.drawer_header}>
-        <Thumbnail large source={require("../assets/images/logo-half.png")} />
+  return (
+    <Container>
+      <Header style={{ height: 200, backgroundColor: "#089D37" }}>
+        <Body style={styles.drawer_header}>
+          <Thumbnail large source={require("../assets/images/logo-half.png")} />
           {Global.username && <Text style={{ color: "white", paddingTop: 10 }}>{Global.username}</Text>}
-
-      </Body>
-    </Header>
-    <Content>
-      <DrawerNavigatorItems {...props} />
-      <TouchableOpacity
+        </Body>
+      </Header>
+      <Content>
+        <DrawerNavigatorItems {...props} />
+        <TouchableOpacity
           onPress={() => {
             AsyncStorage.clear();
             props.navigation.navigate("Auth");
           }}
-          style={{flexDirection:"row", alignItems:"center"}}>
-        <Icon name="md-settings" type="ionicon" style={{ fontSize: 25,marginStart:18,marginEnd:32, }} />
-        <Text style={{color:"black", fontWeight:"bold"}}> Logout</Text>
-      </TouchableOpacity>
+          style={{ flexDirection: "row", alignItems: "center" }}>
+          <Icon name="md-settings" type="ionicon" style={{ fontSize: 25, marginStart: 18, marginEnd: 32, }} />
+          <Text style={{ color: "black", fontWeight: "bold" }}> Logout</Text>
+        </TouchableOpacity>
 
-    </Content>
-  </Container>
-)}
+      </Content>
+    </Container>
+  )
+}
 
 const AppDrawerNavigator = createDrawerNavigator(
   {
@@ -239,7 +211,8 @@ export default createAppContainer(
       AuthLoading: AuthLoadingScreen,
       Start: GetStartedScreen,
       Auth: SignInScreen,
-      SignUp: SignUpScreen
+      SignUp: SignUpScreen,
+      ForgotPassword: ForgotPasswordScreen
     },
     {
       initialRouteName: "Start",

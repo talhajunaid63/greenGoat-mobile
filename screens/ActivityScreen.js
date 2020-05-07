@@ -1,28 +1,7 @@
+import { Body, Container, Content, Left, List, ListItem, Right, Thumbnail } from "native-base";
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-  FlatList,
-  AsyncStorage,
-  ActivityIndicator
-} from "react-native";
-import {
-  Container,
-  Header,
-  Content,
-  List,
-  ListItem,
-  Left,
-  Body,
-  Right,
-  Thumbnail
-} from "native-base";
-import { withNavigationFocus } from "react-navigation";
-import {BASE_URL} from "../config/NetworkConstants";
+import { ActivityIndicator, AsyncStorage, FlatList, StyleSheet, Text, View } from "react-native";
+import { BASE_URL } from "../config/NetworkConstants";
 
 export default class ActivityScreen extends React.Component {
   constructor(props) {
