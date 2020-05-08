@@ -185,8 +185,26 @@ export default class ProfileScreen extends React.Component {
   updatePhoneType(type) {
     this.setState({ phone_type: type })
   }
+
+  formatDate(date) {
+    let d = new Date(date);
+    let month = '' + (d.getMonth() + 1);
+    let day = '' + d.getDate();
+    let year = d.getFullYear();
+
+    if (month.length < 2)
+      month = '0' + month;
+    if (day.length < 2)
+      day = '0' + day;
+
+    return [year, month, day].join('-');
+  }
   render() {
-    if (this.state.progress == false) {
+
+    let today = new Date().toDateString()
+    let formated = this.formatDate(today)
+
+      if (this.state.progress == false) {
       return (
         <View style={{ marginTop: 200 }}>
           <ActivityIndicator size="large" color="#00ff00" />
@@ -436,6 +454,7 @@ export default class ProfileScreen extends React.Component {
                 style={{ width: 200 }}
                 date={this.state.date}
                 mode="date"
+                maxDate={new Date().toISOString().slice(0, 10)}
                 placeholder="select date"
                 format="YYYY-MM-DD"
                 confirmBtnText="Confirm"
