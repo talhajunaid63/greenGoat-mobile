@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Alert, AsyncStorage, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Button, Header, Icon, Input } from "react-native-elements";
 import { BASE_URL } from "../config/NetworkConstants";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 
 export default class ContactUsScreen extends Component {
@@ -43,30 +44,34 @@ export default class ContactUsScreen extends Component {
 
   render() {
     return (
-      <ScrollView style={styles.container}>
-        <Header
-          backgroundColor={"#089D37"}
-          leftComponent={
-            <Icon
-              name="menu"
-              color="#fff"
-              onPress={() => this.props.navigation.openDrawer()}
-            />
-          }
-          centerComponent={{
-            text: this.props.navigation.state.routeName,
-            style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
-          }}
-        />
-        <Text style={styles.heading}>Contact Us</Text>
-        <View style={styles.paragraph}>
-          <Text>Email</Text>
-          <Input placeholder="Email" value={this.state.email} editable={false} />
-        </View>
+      <View style={styles.container}>
+        <KeyboardAwareScrollView
+          enableOnAndroid={true}
+          extraHeight={-220}
+          extraScrollHeight={-220}>
+          <Header
+            backgroundColor={"#089D37"}
+            leftComponent={
+              <Icon
+                name="menu"
+                color="#fff"
+                onPress={() => this.props.navigation.openDrawer()}
+              />
+            }
+            centerComponent={{
+              text: this.props.navigation.state.routeName,
+              style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
+            }}
+          />
+          <Text style={styles.heading}>Contact Us</Text>
+          <View style={styles.paragraph}>
+            <Text>Email</Text>
+            <Input placeholder="Email" value={this.state.email} editable={false} />
+          </View>
 
-        <View style={styles.paragraph}>
-          <Text style={{ marginVertical: 10 }}>Enter Your Message</Text>
-          {/* <TextInput
+          <View style={styles.paragraph}>
+            <Text style={{ marginVertical: 10 }}>Enter Your Message</Text>
+            {/* <TextInput
             style={{
               borderColor: "grey",
               borderWidth: 1,
@@ -82,22 +87,23 @@ export default class ContactUsScreen extends Component {
             numberOfLines={10}
             onChangeText={text => this.setState({ query: text })}
           /> */}
-          <Input
-            multiline
-            numberOfLines={10}
-            onChangeText={text => this.setState({ query: text })}
-            placeholder="Enter your message"
-          />
-        </View>
+            <Input
+              multiline
+              numberOfLines={10}
+              onChangeText={text => this.setState({ query: text })}
+              placeholder="Enter your message"
+            />
+          </View>
 
-        <View style={styles.paragraph}>
-          <Button
-            title="Send"
-            buttonStyle={{ backgroundColor: "#089D37" }}
-            onPress={this.contactus}
-          />
-        </View>
-      </ScrollView>
+          <View style={styles.paragraph}>
+            <Button
+              title="Send"
+              buttonStyle={{ backgroundColor: "#089D37" }}
+              onPress={this.contactus}
+            />
+          </View>
+        </KeyboardAwareScrollView>
+      </View>
     );
   }
 }
