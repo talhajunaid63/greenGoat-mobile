@@ -1,5 +1,5 @@
 import React from "react";
-import { AsyncStorage, Image, ImageBackground, StyleSheet, View } from "react-native";
+import { AsyncStorage, Image, ImageBackground, StyleSheet, View, Alert } from "react-native";
 import AwesomeAlert from "react-native-awesome-alerts";
 import { Button, Input } from "react-native-elements";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -93,7 +93,7 @@ export default class SignInScreen extends React.Component {
                 <Button
                   buttonStyle={styles.button}
                   title="Login"
-                  titleStyle={{ fontSize: 28, size: 28 }}
+                  // titleStyle={{ fontSize: 28, size: 28 }}
                   raised={true}
                   onPress={this.LoginApi}
                 />
@@ -144,60 +144,80 @@ export default class SignInScreen extends React.Component {
   };
 
   LoginApi = async () => {
-    var success = false;
-    this.setState({ Loader: !this.state.Loader })
-    fetch(BASE_URL + "auth/sign_in", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        email: this.state.username,
-        password: this.state.password
+    if (this.state.username != "" && this.state.password != "") {
+      var success = false;
+      this.setState({ Loader: !this.state.Loader })
+      fetch(BASE_URL + "auth/sign_in", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          email: this.state.username,
+          password: this.state.password
+        })
       })
-    })
-      .then(response => {
-        if (response.headers.get("access-token")) {
-          console.log("kjnsjknxsjk", response);
-          AsyncStorage.setItem(
-            "userToken",
-            response.headers.get("access-token")
-          );
-          AsyncStorage.setItem("uid", response.headers.get("uid"));
-          AsyncStorage.setItem("client", response.headers.get("client"));
-          success = true;
-        } else {
-          this.setState({ Loader: !this.state.Loader })
-          this.showAlert();
-        }
-        return response.json();
-      })
-      .then(responseJson => {
-        if (success == true) {
-          AsyncStorage.setItem(
-            "user_name",
-            (
-              responseJson["data"]["firstname"] +
-              responseJson["data"]["lastname"]
-            ).toString()
-          );
-          AsyncStorage.setItem(
-            "user_email",
-            responseJson["data"]["email"].toString()
-          );
-          AsyncStorage.setItem(
-            "user_id",
-            responseJson["data"]["id"].toString()
-          );
-          this.setState({ Loader: !this.state.Loader })
-          this.props.navigation.navigate("Main");
-        }
-      })
+        .then(response => {
+          debugger
+          if (response.status === 200) {
+            debugger
+            AsyncStorage.setItem(
+              "userToken",
+              response.headers.get("access-token")
+            );
+            AsyncStorage.setItem("uid", response.headers.get("uid"));
+            AsyncStorage.setItem("client", response.headers.get("client"));
+            success = true;
+          }
+          // else if (response.success == false) {
+          //   debugger
+          //   Alert.alert('Error', response.errors)
+          // }
+          else {
+            debugger
+            this.setState({ Loader: !this.state.Loader })
+            // Alert.alert('Error', 'Email or Password Incorrect ')
+            return response.json()
+            // this.showAlert();
+          }
+          return response.json();
+        })
+        .then(responseJson => {
 
-      .catch(error => {
-        console.error(error);
-      });
-  };
+          if (success == true) {
+            AsyncStorage.setItem(
+              "user_name",
+              (
+                responseJson["data"]["firstname"] +
+                responseJson["data"]["lastname"]
+              ).toString()
+            );
+            AsyncStorage.setItem(
+              "user_email",
+              responseJson["data"]["email"].toString()
+            );
+            AsyncStorage.setItem(
+              "user_id",
+              responseJson["data"]["id"].toString()
+            );
+            this.setState({ Loader: !this.state.Loader })
+            this.props.navigation.navigate("Main");
+          }
+          else {
+            debugger
+            Alert.alert('Error', responseJson.errors[0] )
+          }
+        })
+
+        .catch(error => {
+          Alert.alert(error);
+        });
+    }
+    else {
+      Alert.alert('Error', 'Email & Password are Required')
+    }
+  }
 }
 
 const styles = StyleSheet.create({

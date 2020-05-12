@@ -9,14 +9,14 @@ export default class ContactUsScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: "",
+      email: "thegoat@greengoat.org",
       query: ""
     };
   }
 
-  async componentWillMount() {
-    this.setState({ email: await AsyncStorage.getItem("user_email") });
-  }
+  // async componentWillMount() {
+  //   this.setState({ email: await AsyncStorage.getItem("user_email") });
+  // }
 
   contactus = async () => {
     fetch(BASE_URL + "contact-us", {
@@ -34,7 +34,7 @@ export default class ContactUsScreen extends Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        Alert.alert("Email sent");
+        Alert.alert("Thanks for reaching out, our team will contact you soon");
       })
 
       .catch(error => {
@@ -45,25 +45,26 @@ export default class ContactUsScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Header
+          backgroundColor={"#089D37"}
+          leftComponent={
+            <Icon
+              name="menu"
+              color="#fff"
+              onPress={() => this.props.navigation.openDrawer()}
+            />
+          }
+          centerComponent={{
+            text: this.props.navigation.state.routeName,
+            style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
+          }}
+        />
+        <Text style={styles.heading}>Contact Us</Text>
         <KeyboardAwareScrollView
           enableOnAndroid={true}
           extraHeight={-220}
+          enableAutomaticScroll={(Platform.OS === 'ios')}
           extraScrollHeight={-220}>
-          <Header
-            backgroundColor={"#089D37"}
-            leftComponent={
-              <Icon
-                name="menu"
-                color="#fff"
-                onPress={() => this.props.navigation.openDrawer()}
-              />
-            }
-            centerComponent={{
-              text: this.props.navigation.state.routeName,
-              style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
-            }}
-          />
-          <Text style={styles.heading}>Contact Us</Text>
           <View style={styles.paragraph}>
             <Text>Email</Text>
             <Input placeholder="Email" value={this.state.email} editable={false} />
@@ -89,7 +90,7 @@ export default class ContactUsScreen extends Component {
           /> */}
             <Input
               multiline
-              numberOfLines={10}
+              numberOfLines={5}
               onChangeText={text => this.setState({ query: text })}
               placeholder="Enter your message"
             />
@@ -103,7 +104,7 @@ export default class ContactUsScreen extends Component {
             />
           </View>
         </KeyboardAwareScrollView>
-      </View>
+      </View >
     );
   }
 }

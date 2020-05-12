@@ -46,12 +46,12 @@ export default class WishListScreen extends React.Component {
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     const { navigation } = this.props;
     this.focusListener = navigation.addListener("didFocus", () => {
 
+      this.renderMyData();
     });
-    this.renderMyData();
   }
 
 
@@ -103,7 +103,7 @@ export default class WishListScreen extends React.Component {
     );
   };
 
-  remove_from_wishlist = async product_id => {
+  remove_from_favroite = async product_id => {
     fetch(BASE_URL + "favourites/remove-from-favourite", {
       method: "POST",
       headers: {
@@ -445,7 +445,7 @@ export default class WishListScreen extends React.Component {
                   <Button
                     buttonStyle={styles.wishlist_button}
                     titleStyle={{ paddingLeft: 5, fontSize: 10 }}
-                    onPress={() => this.remove_from_wishlist(item.id)}
+                    onPress={() => this.remove_from_favroite(item.id)}
                     icon={
                       <Icon
                         name="md-heart"

@@ -222,7 +222,7 @@ export default class GroupItemDetailScreen extends React.Component {
                             {
                               width: 200,
                               height: 200,
-                              borderRadius: 100,
+                              borderRadius: 10,
                               backgroundColor: "white"
                             }
                           ]}
@@ -232,7 +232,7 @@ export default class GroupItemDetailScreen extends React.Component {
                             style={{
                               width: 200,
                               height: 200,
-                              borderRadius: 100,
+                              borderRadius: 10,
                               overflow: "hidden"
                             }}
                           />
@@ -288,8 +288,8 @@ const styles = StyleSheet.create({
   productImg: {
     width: 200,
     height: 200,
-    borderRadius: 50,
-    backgroundColor: "green"
+    borderRadius: 10,
+    backgroundColor: "gray"
   },
   name: {
     fontSize: 28,
@@ -362,7 +362,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 30,
     backgroundColor: "#27a517",
-    padding: 5
+    padding: 5,
+    marginBottom: 10
   },
   shareButtonText: {
     color: "#FFFFFF",

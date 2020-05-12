@@ -2,7 +2,7 @@ import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
 import React from "react";
-import { Image, ImageBackground, Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ImageBackground, Linking, StyleSheet, Text, TouchableOpacity, View, Alert } from "react-native";
 import AwesomeAlert from "react-native-awesome-alerts";
 import CheckBox from 'react-native-check-box';
 import { Button, Input } from "react-native-elements";
@@ -143,8 +143,7 @@ export default class SignUpScreen extends React.Component {
     });
 
     if (!result.cancelled) {
-      this.setState({ image_uri: result.uri });
-      this.setState({ image_base64: result.base64 });
+      this.setState({ image_uri: result.uri, image_base64: result.base64 });
     }
   };
   updateTerms() {
@@ -393,6 +392,7 @@ export default class SignUpScreen extends React.Component {
               <View style={{ width: "60%" }}>
                 <Input
                   placeholder="Phone"
+                  keyboardType='number-pad'
                   placeholderTextColor="#7777775c"
                   leftIcon={{
                     type: "font-awesome",
@@ -467,64 +467,77 @@ export default class SignUpScreen extends React.Component {
     );
   }
   SignupApi = async () => {
-    if (this.state.terms) {
-      this.setState({
-        errormessage: "In progress....",
-        errortitle: "Loading"
-      });
-      this.showAlert();
-      fetch(BASE_URL + "auth", {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json, text/plain'
-        },
-        body: JSON.stringify({
-          firstname: this.state.firstname,
-          lastname: this.state.lastname,
-          email: this.state.email,
-          password: this.state.password,
-          password_confirmation: this.state.password_confirmation,
-          confirm_success_url: "/",
-          phone: this.state.phone,
-          role: this.state.role,
-          phone_type:
-            this.state.phone_type === "Cellphone"
-              ? "cell"
-              : this.state.phone_type,
-          image: this.state.image_base64
-        })
-      })
-        .then(response => response.json())
-        .then(responseJson => {
-          if (responseJson["status"] == 'success') {
-            // this.hideAlert();
-            this.setState({
-              errormessage: "Please check your email to confirm registration",
-              errortitle: "Success",
-              signup_success: "true"
-            });
+    const { firstname, lastname, email, password, password_confirmation, phone, role, terms } = this.state
+    if (firstname && lastname && email && password && password_confirmation && phone && role) {
+      if (terms) {
+        if (password === password_confirmation) {
+          this.setState({
+            errormessage: "In progress....",
+            errortitle: "Loading"
+          });
+          this.showAlert();
+          fetch(BASE_URL + "auth", {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json, text/plain'
+            },
+            body: JSON.stringify({
+              firstname: this.state.firstname,
+              lastname: this.state.lastname,
+              email: this.state.email,
+              password: this.state.password,
+              password_confirmation: this.state.password_confirmation,
+              confirm_success_url: "/",
+              phone: this.state.phone,
+              role: this.state.role,
+              phone_type:
+                this.state.phone_type === "Cellphone"
+                  ? "cell"
+                  : this.state.phone_type,
+              image: this.state.image_base64
+            })
+          })
+            .then(response => response.json())
+            .then(responseJson => {
+              debugger
+              if (responseJson["status"] == 'success') {
+                // this.hideAlert();
+                this.setState({
+                  errormessage: "Please check your email to confirm registration",
+                  errortitle: "Success",
+                  signup_success: "true"
+                });
 
-            this.showAlert();
-            // Alert.alert("Please check your email to confirm registration")
-          } else {
-            // this.hideAlert();
-            this.setState({
-              // errormessage: responseJson["errors"].full_messages[0],
-              errortitle: "Error"
-            });
-            this.showAlert();
-            // Alert.alert(responseJson["errors"].full_messages[0])
-          }
-        })
+                this.showAlert();
+                // Alert.alert("Please check your email to confirm registration")
+              } else {
+                debugger
+                // this.hideAlert();
+                this.setState({
+                  // errormessage: responseJson["errors"].full_messages[0],
+                  errortitle: "Error"
+                });
+                this.showAlert();
+                // Alert.alert(responseJson["errors"].full_messages[0])
+              }
+            })
 
-        .catch(error => {
-          console.error(error);
-        });
+            .catch(error => {
+              console.error(error);
+            });
+        }
+        else {
+          Alert.alert("Password Error", 'Password not Match')
+        }
+      }
+      else {
+        Alert, alert('Terms Error', 'Kindly accept terms and condition')
+      }
+
     }
     else {
-      this.setState({ errormessage: "Kindly accept terms and conditions", errortitle: "Alert", showAlert: true });
-
+      Alert.alert("Error", "All Fields are Required")
     }
   };
 }

@@ -224,7 +224,7 @@ export default class HomeScreen extends React.Component {
                             title="Activities"
                             titleStyle={{ fontSize: 20 }}
                             raised={true}
-                            onPress={() => this.props.navigation.navigate('Donation')}
+                            onPress={() => this.props.navigation.navigate('ActivityPlace')}
                         />
                     </View>
                 </View>

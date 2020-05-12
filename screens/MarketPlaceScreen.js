@@ -65,6 +65,7 @@ export default class MarketPlaceScreen extends React.Component {
       modalVisible: false,
       filtermodalVisible: false,
       filtertitle: "",
+      fav_product_ids: [],
       minvalue: 0,
       maxvalue: 10000,
       category: "Electronics",
@@ -94,12 +95,13 @@ export default class MarketPlaceScreen extends React.Component {
     };
   }
 
-  componentDidMount() {
+  UNSAFE_componentWillMount() {
     const { navigation } = this.props;
     this.focusListener = navigation.addListener("didFocus", () => {
       this.renderMyData();
       this.get_group_items();
       this.get_categories_data();
+      this.get_fav_product();
     });
   }
 
@@ -108,9 +110,9 @@ export default class MarketPlaceScreen extends React.Component {
     this.focusListener.remove();
   }
 
-  componentWillMount() {
-    this.renderMyData();
-  }
+  // componentWillMount() {
+  //   this.renderMyData();
+  // }
 
   async renderMyData() {
     if (this.state.categoryid !== -1 && this.state.maxvalue != -1) {
@@ -170,6 +172,7 @@ export default class MarketPlaceScreen extends React.Component {
       })
       .catch(error => {
         console.log("bbbbbbbb", error);
+        throw error;
       });
   }
 
@@ -200,6 +203,7 @@ export default class MarketPlaceScreen extends React.Component {
       })
       .catch(error => {
         console.log(error);
+        throw error;
       });
   }
 
@@ -227,6 +231,7 @@ export default class MarketPlaceScreen extends React.Component {
       })
       .catch(error => {
         console.log(error);
+        throw error;
       });
   }
 
@@ -300,30 +305,96 @@ export default class MarketPlaceScreen extends React.Component {
 
     this.setState({ search });
   };
-
-  add_to_wishlist = async item => {
-    fetch(BASE_URL + "favourites/add-to-favourite", {
-      method: "POST",
+  async get_fav_product() {
+    fetch(BASE_URL + "favourites", {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
         "access-token": await AsyncStorage.getItem("userToken"),
-        Accept: "application/json",
         uid: await AsyncStorage.getItem("uid"),
         client: await AsyncStorage.getItem("client")
-      },
-      body: JSON.stringify({
-        user_id: await AsyncStorage.getItem("uid"),
-        product_id: item.id
-      })
+      }
     })
       .then(response => response.json())
       .then(responseJson => {
-        Alert.alert("Product added to favourite list");
-      })
+        debugger
+        this.setState(
+          {
+            fav_product_ids: responseJson["product_ids"],
+            wishlist_id: responseJson["id"]
+          },
+          () => {
 
+          }
+        );
+      })
       .catch(error => {
-        console.error(error);
+        console.log(error);
       });
+  }
+
+  add_to_wishlist = async item => {
+    debugger
+    if (item.product_ids) {
+      item.product_ids.map(async (item) => {
+        fetch(BASE_URL + "favourites/add-to-favourite", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "access-token": await AsyncStorage.getItem("userToken"),
+            uid: await AsyncStorage.getItem("uid"),
+            client: await AsyncStorage.getItem("client")
+          },
+          body: JSON.stringify({
+            user_id: await AsyncStorage.getItem("uid"),
+            product_id: item
+          })
+        })
+          .then(response => response.json())
+          .then(responseJson => {
+            debugger
+            Promise.resolve(this.get_fav_product())
+            // Alert.alert("Product added to favourite list");
+          })
+
+          .catch(error => {
+            console.error(error);
+          });
+      })
+      Alert.alert("Product added to favourite list");
+    }
+    else {
+      try {
+        fetch(BASE_URL + "favourites/add-to-favourite", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "access-token": await AsyncStorage.getItem("userToken"),
+            uid: await AsyncStorage.getItem("uid"),
+            client: await AsyncStorage.getItem("client")
+          },
+          body: JSON.stringify({
+            user_id: await AsyncStorage.getItem("uid"),
+            product_id: item.id
+          })
+        })
+          .then(response => response.json())
+          .then(responseJson => {
+            debugger
+            Promise.resolve(this.get_fav_product())
+            Alert.alert("Product added to favourite list");
+          })
+
+          .catch(error => {
+            console.error(error);
+          });
+      }
+      catch (err) {
+        debugger
+        Alert.alert('opps', err)
+      }
+    }
+
   };
 
   onDropdownChanege = (vall, ind) => {
@@ -404,6 +475,36 @@ export default class MarketPlaceScreen extends React.Component {
       }));
     }
   };
+  remove_from_favroite = async product_id => {
+    fetch(BASE_URL + "favourites/remove-from-favourite", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "access-token": await AsyncStorage.getItem("userToken"),
+        uid: await AsyncStorage.getItem("uid"),
+        client: await AsyncStorage.getItem("client")
+      },
+      body: JSON.stringify({
+        user_id: await AsyncStorage.getItem("uid"),
+        product_id: product_id
+      })
+    })
+      .then(response => response.json())
+      .then(async (responseJson) => {
+        debugger
+        this.setState({
+          fav_product_ids: responseJson.product_id
+        })
+        Alert.alert("Product removed from wish list");
+        await this.renderMyData();
+        await this.get_fav_product();
+      })
+      .catch(error => {
+        console.log(error);
+        throw error;
+      });
+  };
+
   _onCardChange = form => {
     // console.log(form);
 
@@ -422,6 +523,7 @@ export default class MarketPlaceScreen extends React.Component {
     this.setModalVisible(true)
   }
   render() {
+    console.log(this.state.fav_product_ids, 'ddddddddddddddddddddd')
     return (
       <View style={styles.container}>
         <Modal
@@ -707,7 +809,9 @@ export default class MarketPlaceScreen extends React.Component {
                             source={{ uri: item }}
                             style={{
                               width: 200,
-                              height: 200
+                              height: 200,
+                              borderTopLeftRadius: 10,
+                              borderTopRightRadius: 10,
                             }}
                           />
                         </View>
@@ -723,9 +827,9 @@ export default class MarketPlaceScreen extends React.Component {
                           type="outline"
                           onPress={() =>
                             this.props.navigation.navigate("ProductDetail", {
-                              item: item
-                            })
-                          }
+                              item: item,
+                              fav: this.state.fav_product_ids && this.state.fav_product_ids.find(element => element == item.id)
+                            })}
                           buttonStyle={styles.detail_button}
                           titleStyle={styles.detail_button_input}
                         />
@@ -754,15 +858,27 @@ export default class MarketPlaceScreen extends React.Component {
                             </View>
                           </View>
                         </View>
-                        <Button
-                          title="Add to Favourite"
-                          type="outline"
-                          onPress={() => {
-                            item.id !== "" ? this.add_to_wishlist(item) : "";
-                          }}
-                          buttonStyle={styles.detail_button}
-                          titleStyle={styles.detail_button_input}
-                        />
+                        {
+                          this.state.fav_product_ids && this.state.fav_product_ids.find(function (element) {
+                            return element == item.id;
+                          }) ?
+                            < Button
+                              buttonStyle={styles.detail_button}
+                              titleStyle={styles.detail_button_input}
+                              type="outline"
+                              onPress={() => this.remove_from_favroite(item.id)}
+                              title="Remove from Favourite"
+                            /> :
+                            <Button
+                              title="Add to Favourite"
+                              type="outline"
+                              onPress={() => {
+                                item.id !== "" ? this.add_to_wishlist(item) : "";
+                              }}
+                              buttonStyle={styles.detail_button}
+                              titleStyle={styles.detail_button_input}
+                            />
+                        }
                       </View>
                     </View>
 
@@ -849,7 +965,9 @@ export default class MarketPlaceScreen extends React.Component {
                             source={{ uri: item }}
                             style={{
                               width: 200,
-                              height: 200
+                              height: 200,
+                              borderTopLeftRadius: 10,
+                              borderTopRightRadius: 10,
                             }}
                           />
                         </View>
@@ -897,15 +1015,29 @@ export default class MarketPlaceScreen extends React.Component {
                             </View>
                           </View>
                         </View>
-                        <Button
-                          title="Add to Favourite"
-                          type="outline"
-                          onPress={() => {
-                            item.id !== "" ? this.add_to_wishlist(item) : "";
-                          }}
-                          buttonStyle={styles.detail_button}
-                          titleStyle={styles.detail_button_input}
-                        />
+                        {
+                          this.state.fav_product_ids && this.state.fav_product_ids.find(function (element) {
+                            return element == item.id;
+                          }) ?
+                            <Button
+                              title="Add to Favourite"
+                              type="outline"
+                              onPress={() => {
+                                item.id !== "" ? this.add_to_wishlist(item) : "";
+                              }}
+                              buttonStyle={styles.detail_button}
+                              titleStyle={styles.detail_button_input}
+                            /> :
+                            <Button
+                              title="Add to Favourite"
+                              type="outline"
+                              onPress={() => {
+                                item.id !== "" ? this.add_to_wishlist(item) : "";
+                              }}
+                              buttonStyle={styles.detail_button}
+                              titleStyle={styles.detail_button_input}
+                            />
+                        }
                       </View>
                     </View>
 
@@ -1151,6 +1283,9 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   productImg: {
-    height: 200
+    height: 200,
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+
   }
 });

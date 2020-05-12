@@ -32,7 +32,8 @@ export default class ProductDetailScreen extends React.Component {
       type: "product",
       data: item,
       buy_button_disabled: true,
-      price: item.price
+      price: item.price,
+      fav_product_ids: [this.props.navigation.state.params.fav]
     };
   }
 
@@ -109,7 +110,9 @@ export default class ProductDetailScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        Alert.alert("Product added to wish list");
+        debugger
+        this.setState({ fav_product_ids: responseJson.product_ids })
+        Alert.alert("Product added to Favorite list");
       })
 
       .catch(error => {
@@ -117,7 +120,7 @@ export default class ProductDetailScreen extends React.Component {
       });
   };
   buyNowItem(item) {
-    this.selectedItem = item
+    this.setState({ selectedItem: item })
     this.setModalVisible(true)
   }
   getPaymentDone = async (token) => {
@@ -144,8 +147,7 @@ export default class ProductDetailScreen extends React.Component {
       .then(responseJson => {
         if (responseJson.message) {
           Alert.alert(responseJson.message)
-        }
-
+        } 
       })
 
       .catch(error => {
@@ -153,6 +155,7 @@ export default class ProductDetailScreen extends React.Component {
       });
   };
   getCreditCardToken = () => {
+    debugger
     if (this.state.expiry != null && this.state.number != null) {
       let expiry = this.state.expiry.split("/")
 
@@ -198,9 +201,67 @@ export default class ProductDetailScreen extends React.Component {
     });
 
   };
+  async get_fav_product() {
+    fetch(BASE_URL + "favourites", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "access-token": await AsyncStorage.getItem("userToken"),
+        uid: await AsyncStorage.getItem("uid"),
+        client: await AsyncStorage.getItem("client")
+      }
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        debugger
+        this.setState(
+          {
+            fav_product_ids: responseJson["product_ids"],
+            wishlist_id: responseJson["id"]
+          },
+          () => {
+
+          }
+        );
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+  remove_from_favroite = async product_id => {
+    debugger
+    fetch(BASE_URL + "favourites/remove-from-favourite", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "access-token": await AsyncStorage.getItem("userToken"),
+        uid: await AsyncStorage.getItem("uid"),
+        client: await AsyncStorage.getItem("client")
+      },
+      body: JSON.stringify({
+        user_id: await AsyncStorage.getItem("uid"),
+        product_id: product_id
+      })
+    })
+      .then(response => response.json())
+      .then(async (responseJson) => {
+        debugger
+        this.setState({
+          fav_product_ids: responseJson.product_id
+        })
+        Alert.alert("Product removed from wish list");
+        await this.renderMyData();
+        await this.get_fav_product();
+      })
+
+      .catch(error => {
+        console.log(error);
+      });
+  };
 
   render() {
     const item = this.props.navigation.state.params.item;
+    const fav = this.state.fav_product_ids && this.state.fav_product_ids.find(element => element == item.id);
     return (
       <View style={styles.container}>
         <ScrollView>
@@ -324,7 +385,7 @@ export default class ProductDetailScreen extends React.Component {
                     key={index}
                     style={[
                       style,
-                      { width: 200, height: 200, borderRadius: 100 }
+                      { width: 200, height: 200, borderRadius: 10 }
                     ]}
                   >
                     <Image
@@ -332,7 +393,7 @@ export default class ProductDetailScreen extends React.Component {
                       style={{
                         width: 200,
                         height: 200,
-                        borderRadius: 100,
+                        borderRadius: 10,
                         overflow: "hidden"
                       }}
                     />
@@ -356,13 +417,23 @@ export default class ProductDetailScreen extends React.Component {
           </View>
 
           <View style={{ alignItems: "center" }}>
-            <Button
-              buttonStyle={styles.wishlist_button}
-              titleStyle={{ paddingLeft: 5, fontSize: 10 }}
-              onPress={this.add_to_wishlist}
-              icon={<Icon name="md-heart" size={15} color="white" />}
-              title="Favourite"
-            />
+            {fav && fav ?
+              <Button
+                buttonStyle={styles.wishlist_button_remove}
+                titleStyle={{ paddingLeft: 5, fontSize: 10 }}
+                onPress={() => this.remove_from_favroite(fav)}
+                // icon={<Icon name="md-heart" size={15} color="white" />}
+                title="Remove from Favourite"
+              />
+              :
+              <Button
+                buttonStyle={styles.wishlist_button}
+                titleStyle={{ paddingLeft: 5, fontSize: 10 }}
+                onPress={this.add_to_wishlist}
+                icon={<Icon name="md-heart" size={15} color="white" />}
+                title="Favourite"
+              />
+            }
           </View>
 
           <View style={{ padding: 5, marginTop: 10 }}>
@@ -392,7 +463,7 @@ const styles = StyleSheet.create({
   productImg: {
     width: 200,
     height: 200,
-    borderRadius: 50,
+    borderRadius: 10,
     backgroundColor: "green"
   },
   name: {
@@ -477,6 +548,13 @@ const styles = StyleSheet.create({
   },
   wishlist_button: {
     backgroundColor: "#097e9e",
+    padding: 5,
+    borderRadius: 5,
+    width: 100,
+    marginTop: 10
+  },
+  wishlist_button_remove: {
+    backgroundColor: "#dc3545",
     padding: 5,
     borderRadius: 10,
     width: 100,

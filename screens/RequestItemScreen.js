@@ -48,7 +48,7 @@ export default class RequestItemScreen extends React.Component {
         };
     }
 
-    componentDidMount() {
+    UNSAFE_componentWillMount() {
         const { navigation } = this.props;
         this.focusListener = navigation.addListener("didFocus", () => {
 
@@ -130,34 +130,60 @@ export default class RequestItemScreen extends React.Component {
         );
     };
     remove_from_wishlist = async product_id => {
-        fetch(BASE_URL + "wishlists/" + product_id, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                "access-token": await AsyncStorage.getItem("userToken"),
-                uid: await AsyncStorage.getItem("uid"),
-                client: await AsyncStorage.getItem("client")
-            },
-            body: JSON.stringify({
-                user_id: await AsyncStorage.getItem("uid"),
-                product_id: product_id
-            })
-        })
-            .then(response => response.json())
-            .then(responseJson => {
+        debugger
+        let confirm = false;
+        confirmRemove = async () => {
+            try {
 
-                Alert.alert("Product removed from wish list");
-                this.renderMyData();
+                fetch(BASE_URL + "wishlists/" + product_id, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "access-token": await AsyncStorage.getItem("userToken"),
+                        uid: await AsyncStorage.getItem("uid"),
+                        client: await AsyncStorage.getItem("client")
+                    },
+                    body: JSON.stringify({
+                        user_id: await AsyncStorage.getItem("uid"),
+                        product_id: product_id
+                    })
+                })
+                    .then(response => response.json())
+                    .then(responseJson => {
+                        debugger
+                        Alert.alert("Product removed from wish list");
+                        this.renderMyData();
 
-            })
+                    })
 
-            .catch(error => {
-                console.log("ERROR:", error);
-            });
+                    .catch(error => {
+                        console.log("ERROR:", error);
+                    });
+            }
+            catch (err) {
+                Alert.alert('oops', err)
+            }
+        }
+        if (confirm) {
+        }
+        else {
+            Alert.alert(
+                'Remove',
+                'Remove item from list?',
+                [
+                    {
+                        text: 'Cancel',
+                        onPress: () => console.log('Cancel Pressed'),
+                        style: 'cancel'
+                    },
+                    { text: 'OK', onPress: () => confirmRemove() }
+                ],
+                { cancelable: false }
+            );
+        }
     };
 
     add_to_favourite = async product_id => {
-
         this.setState({ progressLoading: true })
         fetch(BASE_URL + "wishlists", {
             method: "POST",
@@ -177,7 +203,10 @@ export default class RequestItemScreen extends React.Component {
 
                 if (responseJson.name != null) {
                     this.renderMyData();
-                    this.setState({ progressLoading: false, addMoreModalVisible: false })
+                    this.setState({
+                        progressLoading: false, addMoreModalVisible: false,
+                        Name: '', Description: ''
+                    })
                     // this.setAddMoreModalVisible(false);
                 }
                 else {
@@ -191,8 +220,8 @@ export default class RequestItemScreen extends React.Component {
             .catch(error => {
                 Alert.alert("Request Failed");
                 this.setState({ progressLoading: false })
-
             });
+
     };
     addMore = () => {
         this.setState({ addMoreModalVisible: true });
@@ -506,10 +535,19 @@ const styles = StyleSheet.create({
     },
     /******** card **************/
     card: {
-        shadowOffset: { width: 10, height: 10 },
-        shadowColor: "black",
-        shadowOpacity: 1,
-        elevation: 5,
+        borderWidth: 1,
+        borderRadius: 2,
+        borderColor: '#ddd',
+        borderBottomWidth: 0,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 1,
+        // shadowOffset: { width: 100, height: 100 },
+        // shadowColor: "black",
+        // shadowOpacity: 5,
+        // elevation: 5,
         justifyContent: "center",
         alignItems: "center",
         display: "flex",
@@ -518,9 +556,8 @@ const styles = StyleSheet.create({
         backgroundColor: "#2a2f32",
         flexBasis: "55%",
         marginHorizontal: 5,
-        borderRadius: 10,
-        borderWidth: 1,
-        borderColor: "#2a2f32"
+        // borderRadius: 8,
+        shadowOpacity: 1.0, borderColor: "#2a2f32"
     },
     cardHeader: {
         paddingVertical: 17,
@@ -653,6 +690,15 @@ const styles = StyleSheet.create({
         paddingStart: 10,
         paddingEnd: 10,
         borderRadius: 12,
+        borderWidth: 1,
+        borderRadius: 2,
+        borderColor: '#ddd',
+        borderBottomWidth: 0,
+        shadowColor: 'black',
+        shadowOffset: { width: 2    , height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 5,
+        elevation: 1,
         backgroundColor: "#5EA64A",
         minHeight: 100,
         marginTop: 20,

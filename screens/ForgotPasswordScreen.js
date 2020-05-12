@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, ImageBackground, StyleSheet, View } from "react-native";
+import { Image, ImageBackground, StyleSheet, View, Alert } from "react-native";
 import AwesomeAlert from "react-native-awesome-alerts";
 import { Button, Input } from "react-native-elements";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -71,7 +71,7 @@ export default class SignInScreen extends React.Component {
                   style={styles.input_style}
                   inputStyle={{ marginLeft: 16 }}
                   inputContainerStyle={{ borderBottomColor: "#d9d9e0" }}
-                  onChangeText={text => this.setState({ useremail: text })}
+                  onChangeText={text => this.setState({ userEmail: text })}
                   autoCapitalize="none"
                 />
               </View>
@@ -118,46 +118,75 @@ export default class SignInScreen extends React.Component {
     );
   }
 
+  validate = (text) => {
+    Alert.alert(text)
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (reg.test(text) === false) {
+      this.setState({ emailError: text })
+      Alert.alert('error', 'must be correct email')
+      return false;
+    }
+    else {
+      return true
+    }
+  }
+
 
   ForgotApi = async () => {
-    var success = false;
-    this.setState({ Loader: !this.state.Loader })
-    await fetch('http://3.84.100.107/users/passwords', {
-      method: "POST",
-      headers: {
-      },
-      body: JSON.stringify({
-        email: this.state.userEmail,
-      })
-    })
-      .then(response => {
-        return response.json()
-      })
+    if (this.state.userEmail != '') {
+      debugger
+      let validate = this.validate(this.state.userEmail)
+      var success = false;
+      if (validate) {
+        console.log(this.state.userEmail)
+        debugger
+        this.setState({ Loader: !this.state.Loader })
+        await fetch('http://3.84.100.107/users/passwords', {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
 
-      .then(responseJson => {
-        if (responseJson.success) {
-          this.setState({
-            Loader: !this.state.Loader,
-            errormessage: responseJson['message'],
-            errortitle: "Success",
-            signup_success: "true"
-          });
-
-          this.showAlert("Success", responseJson['message']);
-          setInterval(() => {
-            // this.props.navigation.navigate("Auth");
-          }, 1000)
-        } else {
-          this.setState({
-            Loader: !this.state.Loader
+          body: JSON.stringify({
+            email: this.state.userEmail,
           })
-          this.showAlert('error', 'something Went Wrong');
-        }
-      })
-      .catch(error => {
-        console.error(error, 'errrrprrrr');
-      });
-  };
+        })
+          .then(response => {
+            debugger
+            return response.json()
+          })
+          .then(responseJson => {
+            if (responseJson.success) {
+
+              this.setState({
+                Loader: !this.state.Loader,
+                errormessage: responseJson['message'],
+                errortitle: "Success",
+                signup_success: "true"
+              });
+
+              Alert.alert("Success", responseJson['message']);
+              setInterval(() => {
+                // this.props.navigation.navigate("Auth");
+              }, 1000)
+            } else {
+              this.setState({
+                Loader: !this.state.Loader
+              })
+              Alert.alert('error', 'something Went Wrong');
+            }
+          })
+          .catch(error => {
+            console.error(error, 'errrrprrrr');
+          });
+      }
+    }
+    else {
+      Alert.alert('Error', 'Email is required')
+    }
+  }
+
 }
 
 const styles = StyleSheet.create({
