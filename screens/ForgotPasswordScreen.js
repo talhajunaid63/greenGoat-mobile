@@ -134,12 +134,10 @@ export default class SignInScreen extends React.Component {
 
   ForgotApi = async () => {
     if (this.state.userEmail != '') {
-      debugger
       let validate = this.validate(this.state.userEmail)
       var success = false;
       if (validate) {
-        console.log(this.state.userEmail)
-        debugger
+
         this.setState({ Loader: !this.state.Loader })
         await fetch('http://3.84.100.107/users/passwords', {
           method: "POST",
@@ -153,7 +151,7 @@ export default class SignInScreen extends React.Component {
           })
         })
           .then(response => {
-            debugger
+
             return response.json()
           })
           .then(responseJson => {

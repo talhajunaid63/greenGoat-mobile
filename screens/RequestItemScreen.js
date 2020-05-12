@@ -130,7 +130,7 @@ export default class RequestItemScreen extends React.Component {
         );
     };
     remove_from_wishlist = async product_id => {
-        debugger
+
         let confirm = false;
         confirmRemove = async () => {
             try {
@@ -150,7 +150,7 @@ export default class RequestItemScreen extends React.Component {
                 })
                     .then(response => response.json())
                     .then(responseJson => {
-                        debugger
+
                         Alert.alert("Product removed from wish list");
                         this.renderMyData();
 
@@ -695,7 +695,7 @@ const styles = StyleSheet.create({
         borderColor: '#ddd',
         borderBottomWidth: 0,
         shadowColor: 'black',
-        shadowOffset: { width: 2    , height: 2 },
+        shadowOffset: { width: 2, height: 2 },
         shadowOpacity: 0.8,
         shadowRadius: 5,
         elevation: 1,

@@ -159,9 +159,9 @@ export default class SignInScreen extends React.Component {
         })
       })
         .then(response => {
-          debugger
+
           if (response.status === 200) {
-            debugger
+
             AsyncStorage.setItem(
               "userToken",
               response.headers.get("access-token")
@@ -171,11 +171,11 @@ export default class SignInScreen extends React.Component {
             success = true;
           }
           // else if (response.success == false) {
-          //   debugger
+          //   
           //   Alert.alert('Error', response.errors)
           // }
           else {
-            debugger
+
             this.setState({ Loader: !this.state.Loader })
             // Alert.alert('Error', 'Email or Password Incorrect ')
             return response.json()
@@ -205,8 +205,8 @@ export default class SignInScreen extends React.Component {
             this.props.navigation.navigate("Main");
           }
           else {
-            debugger
-            Alert.alert('Error', responseJson.errors[0] )
+
+            Alert.alert('Error', responseJson.errors[0])
           }
         })
 

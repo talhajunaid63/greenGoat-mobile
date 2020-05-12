@@ -110,7 +110,7 @@ export default class ProductDetailScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        debugger
+
         this.setState({ fav_product_ids: responseJson.product_ids })
         Alert.alert("Product added to Favorite list");
       })
@@ -147,7 +147,7 @@ export default class ProductDetailScreen extends React.Component {
       .then(responseJson => {
         if (responseJson.message) {
           Alert.alert(responseJson.message)
-        } 
+        }
       })
 
       .catch(error => {
@@ -155,7 +155,7 @@ export default class ProductDetailScreen extends React.Component {
       });
   };
   getCreditCardToken = () => {
-    debugger
+
     if (this.state.expiry != null && this.state.number != null) {
       let expiry = this.state.expiry.split("/")
 
@@ -213,7 +213,7 @@ export default class ProductDetailScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        debugger
+
         this.setState(
           {
             fav_product_ids: responseJson["product_ids"],
@@ -229,7 +229,7 @@ export default class ProductDetailScreen extends React.Component {
       });
   }
   remove_from_favroite = async product_id => {
-    debugger
+
     fetch(BASE_URL + "favourites/remove-from-favourite", {
       method: "POST",
       headers: {
@@ -245,7 +245,7 @@ export default class ProductDetailScreen extends React.Component {
     })
       .then(response => response.json())
       .then(async (responseJson) => {
-        debugger
+
         this.setState({
           fav_product_ids: responseJson.product_id
         })

@@ -61,23 +61,20 @@ export default class ProfileScreen extends React.Component {
       }
     })
       .then(response => {
-        debugger
         if (response.status !== 200) {
-          debugger
+
           return response.text().then((res) => {
             console.log(res)
           })
 
         }
         else {
-          debugger
+
           return response.json()
         }
       }
       )
       .then(responseJson => {
-        debugger
-        console.log(responseJson, 'essssssssssssssssssssssss')
         this.setState({
           progress: true,
           firstname: responseJson["firstname"],
@@ -204,7 +201,7 @@ export default class ProfileScreen extends React.Component {
     let today = new Date().toDateString()
     let formated = this.formatDate(today)
 
-      if (this.state.progress == false) {
+    if (this.state.progress == false) {
       return (
         <View style={{ marginTop: 200 }}>
           <ActivityIndicator size="large" color="#00ff00" />

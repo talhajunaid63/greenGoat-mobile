@@ -29,7 +29,7 @@ export default class ActivityScreen extends React.Component {
   }
 
   async renderMyData() {
-    fetch(BASE_URL+"myactivity", {
+    fetch(BASE_URL + "myactivity", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -40,7 +40,6 @@ export default class ActivityScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        console.log(responseJson);
         // this.setState({ name : responseJson["name"] })
         // this.setState({ email : responseJson["email"] })
         this.setState({

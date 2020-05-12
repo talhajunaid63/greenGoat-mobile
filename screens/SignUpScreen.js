@@ -500,7 +500,7 @@ export default class SignUpScreen extends React.Component {
           })
             .then(response => response.json())
             .then(responseJson => {
-              debugger
+
               if (responseJson["status"] == 'success') {
                 // this.hideAlert();
                 this.setState({
@@ -512,7 +512,7 @@ export default class SignUpScreen extends React.Component {
                 this.showAlert();
                 // Alert.alert("Please check your email to confirm registration")
               } else {
-                debugger
+
                 // this.hideAlert();
                 this.setState({
                   // errormessage: responseJson["errors"].full_messages[0],

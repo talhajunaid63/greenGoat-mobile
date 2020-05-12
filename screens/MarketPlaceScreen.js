@@ -317,7 +317,7 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        debugger
+    
         this.setState(
           {
             fav_product_ids: responseJson["product_ids"],
@@ -334,7 +334,7 @@ export default class MarketPlaceScreen extends React.Component {
   }
 
   add_to_wishlist = async item => {
-    debugger
+
     if (item.product_ids) {
       item.product_ids.map(async (item) => {
         fetch(BASE_URL + "favourites/add-to-favourite", {
@@ -352,7 +352,7 @@ export default class MarketPlaceScreen extends React.Component {
         })
           .then(response => response.json())
           .then(responseJson => {
-            debugger
+        
             Promise.resolve(this.get_fav_product())
             // Alert.alert("Product added to favourite list");
           })
@@ -380,7 +380,7 @@ export default class MarketPlaceScreen extends React.Component {
         })
           .then(response => response.json())
           .then(responseJson => {
-            debugger
+        
             Promise.resolve(this.get_fav_product())
             Alert.alert("Product added to favourite list");
           })
@@ -390,7 +390,7 @@ export default class MarketPlaceScreen extends React.Component {
           });
       }
       catch (err) {
-        debugger
+    
         Alert.alert('opps', err)
       }
     }
@@ -491,7 +491,7 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(async (responseJson) => {
-        debugger
+    
         this.setState({
           fav_product_ids: responseJson.product_id
         })
@@ -523,7 +523,6 @@ export default class MarketPlaceScreen extends React.Component {
     this.setModalVisible(true)
   }
   render() {
-    console.log(this.state.fav_product_ids, 'ddddddddddddddddddddd')
     return (
       <View style={styles.container}>
         <Modal
@@ -1015,7 +1014,7 @@ export default class MarketPlaceScreen extends React.Component {
                             </View>
                           </View>
                         </View>
-                        {
+                        {/* {
                           this.state.fav_product_ids && this.state.fav_product_ids.find(function (element) {
                             return element == item.id;
                           }) ?
@@ -1037,7 +1036,7 @@ export default class MarketPlaceScreen extends React.Component {
                               buttonStyle={styles.detail_button}
                               titleStyle={styles.detail_button_input}
                             />
-                        }
+                        } */}
                       </View>
                     </View>
 

@@ -666,7 +666,6 @@ export class step2 extends Component {
         });
       })
       .catch(error => {
-        console.log("Error:", error);
         this.setState({
           iszipError: true,
           loading: false,
