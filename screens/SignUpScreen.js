@@ -47,8 +47,8 @@ export default class SignUpScreen extends React.Component {
       ],
       userTypeDropDown: [
         { value: 'contractor', checked: false, label: 'Contractor' },
-        { value: 'appraiser', checked: false, label: 'Appraiser' },
-        { value: 'doner', checked: false, label: 'Doner' },
+        // { value: 'appraiser', checked: false, label: 'Appraiser' },
+        { value: 'doner', checked: false, label: 'Donor' },
         { value: 'buyer', checked: false, label: 'Buyer' },
         { value: 'real_estate_agent', checked: false, label: 'Real Estate Agent' }
 
@@ -366,7 +366,7 @@ export default class SignUpScreen extends React.Component {
                 <Image
                   resizeMode={"contain"}
                   source={this.state.phone_type === "Cellphone" ? phone : land}
-                  style={{ width: "20%", height: 22 }}
+                  style={{ width: "23%", height: 22 }}
                 />
                 <Dropdown
                   label=""
@@ -391,7 +391,7 @@ export default class SignUpScreen extends React.Component {
               </View>
               <View style={{ width: "60%" }}>
                 <Input
-                  placeholder="Phone"
+                  placeholder="Contact Number"
                   keyboardType='number-pad'
                   placeholderTextColor="#7777775c"
                   leftIcon={{
@@ -473,7 +473,7 @@ export default class SignUpScreen extends React.Component {
         if (password === password_confirmation) {
           this.setState({
             errormessage: "In progress....",
-            errortitle: "Loading"
+            errortitle: " "
           });
           this.showAlert();
           fetch(BASE_URL + "auth", {
@@ -532,12 +532,12 @@ export default class SignUpScreen extends React.Component {
         }
       }
       else {
-        Alert, alert('Terms Error', 'Kindly accept terms and condition')
+        Alert, alert('Terms Error', 'Please accept the terms and conditions')
       }
 
     }
     else {
-      Alert.alert("Error", "All Fields are Required")
+      Alert.alert("Field Error", "Please fill all the required fields")
     }
   };
 }

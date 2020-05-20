@@ -132,38 +132,6 @@ export default class RequestItemScreen extends React.Component {
     remove_from_wishlist = async product_id => {
 
         let confirm = false;
-        confirmRemove = async () => {
-            try {
-
-                fetch(BASE_URL + "wishlists/" + product_id, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "access-token": await AsyncStorage.getItem("userToken"),
-                        uid: await AsyncStorage.getItem("uid"),
-                        client: await AsyncStorage.getItem("client")
-                    },
-                    body: JSON.stringify({
-                        user_id: await AsyncStorage.getItem("uid"),
-                        product_id: product_id
-                    })
-                })
-                    .then(response => response.json())
-                    .then(responseJson => {
-
-                        Alert.alert("Product removed from wish list");
-                        this.renderMyData();
-
-                    })
-
-                    .catch(error => {
-                        console.log("ERROR:", error);
-                    });
-            }
-            catch (err) {
-                Alert.alert('oops', err)
-            }
-        }
         if (confirm) {
         }
         else {
@@ -176,7 +144,39 @@ export default class RequestItemScreen extends React.Component {
                         onPress: () => console.log('Cancel Pressed'),
                         style: 'cancel'
                     },
-                    { text: 'OK', onPress: () => confirmRemove() }
+                    {
+                        text: 'OK', onPress: async () => {
+                            try {
+                                fetch(BASE_URL + "wishlists/" + product_id, {
+                                    method: "DELETE",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        "access-token": await AsyncStorage.getItem("userToken"),
+                                        uid: await AsyncStorage.getItem("uid"),
+                                        client: await AsyncStorage.getItem("client")
+                                    },
+                                    // body: JSON.stringify({
+                                    //     user_id: await AsyncStorage.getItem("uid"),
+                                    //     product_id: product_id
+                                    // })
+                                })
+                                    .then(response => response.json())
+                                    .then(responseJson => {
+                                        console.log(responseJson)
+                                        // Alert.alert("Product removed from wish list");
+                                        this.renderMyData();
+
+                                    })
+
+                                    .catch(error => {
+                                        console.log("ERROR:", error);
+                                    });
+                            }
+                            catch (err) {
+                                Alert.alert('oops', err)
+                            }
+                        }
+                    }
                 ],
                 { cancelable: false }
             );
@@ -184,43 +184,50 @@ export default class RequestItemScreen extends React.Component {
     };
 
     add_to_favourite = async product_id => {
-        this.setState({ progressLoading: true })
-        fetch(BASE_URL + "wishlists", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "access-token": await AsyncStorage.getItem("userToken"),
-                uid: await AsyncStorage.getItem("uid"),
-                client: await AsyncStorage.getItem("client")
-            },
-            body: JSON.stringify({
-                name: this.state.Name,
-                description: this.state.Description
-            })
-        })
-            .then(response => response.json())
-            .then(responseJson => {
+        if (this.state.Name != "" && this.state.Description != "") {
 
-                if (responseJson.name != null) {
-                    this.renderMyData();
-                    this.setState({
-                        progressLoading: false, addMoreModalVisible: false,
-                        Name: '', Description: ''
-                    })
-                    // this.setAddMoreModalVisible(false);
-                }
-                else {
-                    Alert.alert("Request Failed")
+
+            this.setState({ progressLoading: true })
+            fetch(BASE_URL + "wishlists", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "access-token": await AsyncStorage.getItem("userToken"),
+                    uid: await AsyncStorage.getItem("uid"),
+                    client: await AsyncStorage.getItem("client")
+                },
+                body: JSON.stringify({
+                    name: this.state.Name,
+                    description: this.state.Description
+                })
+            })
+                .then(response => response.json())
+                .then(responseJson => {
+
+                    if (responseJson.name != null) {
+                        this.renderMyData();
+                        this.setState({
+                            progressLoading: false, addMoreModalVisible: false,
+                            Name: '', Description: ''
+                        })
+                        // this.setAddMoreModalVisible(false);
+                    }
+                    else {
+                        Alert.alert("Request Failed")
+                        this.setState({ progressLoading: false })
+                    }
+                    //  this.renderMyData();
+                    //    Alert.alert("Product removed from wish list");
+                })
+
+                .catch(error => {
+                    Alert.alert("Request Failed");
                     this.setState({ progressLoading: false })
-                }
-                //  this.renderMyData();
-                //    Alert.alert("Product removed from wish list");
-            })
-
-            .catch(error => {
-                Alert.alert("Request Failed");
-                this.setState({ progressLoading: false })
-            });
+                });
+        }
+        else {
+            Alert.alert("Field Error", "All Field are Required")
+        }
 
     };
     addMore = () => {

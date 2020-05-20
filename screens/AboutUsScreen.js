@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { ScrollView, StyleSheet, Text, View   } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Header, Icon } from "react-native-elements";
 
 
@@ -17,7 +17,7 @@ export default class AboutUsScreen extends Component {
             />
           }
           centerComponent={{
-            text: this.props.navigation.state.routeName,
+            text: "About Us",
             style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
           }}
         />
@@ -36,13 +36,25 @@ export default class AboutUsScreen extends Component {
           project money by scrutinizing and managing waste streams.{" "}
           </Text>
           <Text style={styles.paragraph}>
-            Amy Director of the Company started the non-profit when she was
-            working on a kitchen project in my own home and recognized the cost
-            and waste of removing and tossing materials in the dumpster and
-            purchasing replacement materials. She believed there was a better way
-            to redistribute the materials, keeping them out of landfills and into
-            the hands of other homeowners who were upcycling and salvaging instead
-            of dumping and trashing.
+            greenGoat also has a staff and rolodex of consultants who are dedicated to the philosophy and forward-thinking economy.
+          </Text>
+          <Text style={styles.paragraph}>
+            Amy Bauman, Director, came from two decades of cost benefit calculations at Fidelity.
+            She is an ardent “evolutionary ecologist” who believes solutions can be both financially efficient and environmentally responsible.
+        </Text>
+          <Text style={styles.paragraph}>
+            Alper Caglayan is a serial start-up investor, having founded Open Sesame,
+            Peoplestreet, Charles River Analytics, and Milcord.  He resides in Maine.
+        </Text>
+
+          <Text style={styles.paragraph}>
+            C. Garrett Laws has a wealth of materials experience, having assumed ownership of The Copper & Slate Company in 2009 after more than a decade of construction work.
+             Laws always seeks work with durable materials and methods, and he enjoys working with historic structures.
+        </Text>
+
+          <Text style={styles.paragraph}>
+            Lauren Burchfield approaches greenGoat from a background in non-profit management (from the health sector) and grant administration.
+              She has first hand experience with reclaimed materials!
         </Text>
 
           <Text style={styles.paragraph}>why the greenGoat name and logo? </Text>
@@ -64,7 +76,7 @@ export default class AboutUsScreen extends Component {
           </Text>
         </ScrollView>
 
-      </View>
+      </View >
     );
   }
 }

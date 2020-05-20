@@ -184,7 +184,7 @@ export default class SignInScreen extends React.Component {
           return response.json();
         })
         .then(responseJson => {
-
+          console.log(responseJson)
           if (success == true) {
             AsyncStorage.setItem(
               "user_name",
@@ -201,6 +201,9 @@ export default class SignInScreen extends React.Component {
               "user_id",
               responseJson["data"]["id"].toString()
             );
+            AsyncStorage.setItem('userImage', responseJson["data"].image)
+            AsyncStorage.setItem('firstName', responseJson["data"].firstname)
+            AsyncStorage.setItem('lastName', responseJson["data"].lastname)
             this.setState({ Loader: !this.state.Loader })
             this.props.navigation.navigate("Main");
           }

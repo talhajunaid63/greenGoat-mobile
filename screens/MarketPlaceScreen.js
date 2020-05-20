@@ -8,6 +8,7 @@ import { Dropdown } from "react-native-material-dropdown";
 import back from "../assets/images/back.png";
 import filterr from "../assets/images/filterr.png";
 import { BASE_URL } from "../config/NetworkConstants";
+import Loader from "./Loader";
 
 // import MultiSlider from "@ptomasroos/react-native-multi-slider";
 export default class MarketPlaceScreen extends React.Component {
@@ -60,6 +61,7 @@ export default class MarketPlaceScreen extends React.Component {
           ]
         }
       ],
+      loading: false,
       backup_data: [],
       backup_data_group: [],
       modalVisible: false,
@@ -69,7 +71,7 @@ export default class MarketPlaceScreen extends React.Component {
       minvalue: 0,
       maxvalue: 10000,
       category: "Electronics",
-      installation: "Yes",
+      installation: "No",
       progress: true,
       categoryid: -1,
       categorydata: [
@@ -93,6 +95,7 @@ export default class MarketPlaceScreen extends React.Component {
       ],
       search: ""
     };
+    this.selectedItem = null
   }
 
   UNSAFE_componentWillMount() {
@@ -106,7 +109,7 @@ export default class MarketPlaceScreen extends React.Component {
   }
 
   componentWillUnmount() {
-    // Remove the event listener
+    // Remove the event listener  
     this.focusListener.remove();
   }
 
@@ -115,6 +118,7 @@ export default class MarketPlaceScreen extends React.Component {
   // }
 
   async renderMyData() {
+    this.setState({ loading: true })
     if (this.state.categoryid !== -1 && this.state.maxvalue != -1) {
       var url = BASE_URL + `products?q[category_id]=${this.state.categoryid}&q[min_price]=${this.state.minvalue}&q[max_price]=${this.state.maxvalue}`;
     }
@@ -124,7 +128,9 @@ export default class MarketPlaceScreen extends React.Component {
     }
     else if (this.state.maxvalue != -1) {
       var url = BASE_URL + `products?q[min_price]=${this.state.minvalue}&q[max_price]=${this.state.maxvalue}`;
-
+    }
+    else if (this.state.installation != 'No') {
+      var url = BASE_URL + `products?q[installation]=${this.state.installation}`
     }
     else {
       var url = BASE_URL + "products";
@@ -149,6 +155,10 @@ export default class MarketPlaceScreen extends React.Component {
     // );
 
     // url.search = new URLSearchParams(data).toString();
+    console.log(await AsyncStorage.getItem("userToken"),
+      await AsyncStorage.getItem("uid"),
+      await AsyncStorage.getItem("client"))
+    debugger
     fetch(url, {
       method: "GET",
       headers: {
@@ -161,13 +171,15 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
+        debugger
         // this.setState({ name : responseJson["name"] })
         // this.setState({ email : responseJson["email"] })
-        this.get_group_items();
+        Promise.resolve(this.get_group_items())
         this.setState({
           data: responseJson,
           backup_data: responseJson,
-          progress: true
+          progress: true,
+          loading: false
         });
       })
       .catch(error => {
@@ -185,7 +197,7 @@ export default class MarketPlaceScreen extends React.Component {
 
     url.search = new URLSearchParams(params).toString();
 
-    fetch(url, {
+    await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -244,7 +256,7 @@ export default class MarketPlaceScreen extends React.Component {
   }
 
   setFilterModalVisible(visible) {
-    this.setState({ filtermodalVisible: visible });
+    this.setState({ filtermodalVisible: visible, search: '', data: this.state.backup_data });
   }
 
   send_enquiry = () => {
@@ -317,11 +329,12 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-    
+
         this.setState(
           {
             fav_product_ids: responseJson["product_ids"],
-            wishlist_id: responseJson["id"]
+            wishlist_id: responseJson["id"],
+            loading: false
           },
           () => {
 
@@ -336,6 +349,7 @@ export default class MarketPlaceScreen extends React.Component {
   add_to_wishlist = async item => {
 
     if (item.product_ids) {
+      this.setState({ loading: true })
       item.product_ids.map(async (item) => {
         fetch(BASE_URL + "favourites/add-to-favourite", {
           method: "POST",
@@ -352,7 +366,7 @@ export default class MarketPlaceScreen extends React.Component {
         })
           .then(response => response.json())
           .then(responseJson => {
-        
+
             Promise.resolve(this.get_fav_product())
             // Alert.alert("Product added to favourite list");
           })
@@ -380,7 +394,7 @@ export default class MarketPlaceScreen extends React.Component {
         })
           .then(response => response.json())
           .then(responseJson => {
-        
+
             Promise.resolve(this.get_fav_product())
             Alert.alert("Product added to favourite list");
           })
@@ -390,7 +404,7 @@ export default class MarketPlaceScreen extends React.Component {
           });
       }
       catch (err) {
-    
+
         Alert.alert('opps', err)
       }
     }
@@ -408,7 +422,20 @@ export default class MarketPlaceScreen extends React.Component {
     this.setState({ category: vall, categoryid: selectedid });
   };
   getPaymentDone = async (token) => {
-    fetch(BASE_URL + "orders", {
+    console.log(this.selectedItem.adjusted_price, 'ssssssss', this.selectedItem.asking_price)
+    var price = 0
+    var type = ''
+    if (this.selectedItem.product_ids) {
+      type = "group"
+      price = this.selectedItem.price
+    }
+    else {
+      let _price = this.selectedItem.adjusted_price === 0 ? this.selectedItem.asking_price : this.selectedItem.adjusted_price
+      type = "item"
+      price = _price
+    }
+
+    await fetch(BASE_URL + "orders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -418,18 +445,21 @@ export default class MarketPlaceScreen extends React.Component {
       },
       body: JSON.stringify({
         "order": {
-          "amount": this.selectedItem.price,
+          "amount": price,
           "token": token,
-          "order_type": "item",
+          "order_type": type,
           "id": this.selectedItem.id
         }
       }
       )
     })
       .then(response => response.json())
-      .then(responseJson => {
+      .then(async (responseJson) => {
         if (responseJson.message) {
+          this.selectedItem = null
           Alert.alert(responseJson.message)
+          await this.setModalVisible(false);
+          await this.renderMyData()
         }
 
       })
@@ -476,6 +506,7 @@ export default class MarketPlaceScreen extends React.Component {
     }
   };
   remove_from_favroite = async product_id => {
+    this.setState({ loading: true })
     fetch(BASE_URL + "favourites/remove-from-favourite", {
       method: "POST",
       headers: {
@@ -491,9 +522,10 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(async (responseJson) => {
-    
+
         this.setState({
-          fav_product_ids: responseJson.product_id
+          fav_product_ids: responseJson.product_id,
+          loading: false
         })
         Alert.alert("Product removed from wish list");
         await this.renderMyData();
@@ -519,12 +551,19 @@ export default class MarketPlaceScreen extends React.Component {
   };
 
   buyNowItem(item) {
+    console.log(item);
     this.selectedItem = item
+    debugger
     this.setModalVisible(true)
   }
   render() {
     return (
       <View style={styles.container}>
+        {this.state.loading === true && (
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <Loader LoaderVisibles={this.state.loading} />
+          </View>
+        )}
         <Modal
           animationType="slide"
           transparent={false}
@@ -626,9 +665,14 @@ export default class MarketPlaceScreen extends React.Component {
               <View style={styles.inputContainer}>
                 <Text>Minimum Price: ${this.state.minvalue}</Text>
                 <Slider
-                  value={this.state.minvalue}
-                  onValueChange={value => this.setState({ minvalue: value })}
-                  maximumValue={100000}
+                  value={this.state.minvalue == 0 ? 0 : this.state.minvalue}
+                  onValueChange={value => {
+                    value < this.state.maxvalue ?
+                      this.setState({ minvalue: value }) :
+                      this.setState({ minvalue: 0 })
+                  }
+                  }
+                  maximumValue={1000}
                   thumbTintColor="#5EA64A"
                   step={1}
                 />
@@ -669,7 +713,7 @@ export default class MarketPlaceScreen extends React.Component {
                 />
               </View>
               <View style={styles.inputContainer}>
-                <Text>Installation Required?</Text>
+                <Text>Uninstallation Needed?</Text>
                 <Dropdown
                   label=""
                   itemColor={"white"}
@@ -711,6 +755,27 @@ export default class MarketPlaceScreen extends React.Component {
                   onPress={this.filter_submit}
                 />
               </View>
+              {this.state.categoryid != -1 && this.state.maxvalue ? (
+                <View style={[styles.inputContainer, { marginVertical: 10, }]}>
+                  <Button
+                    title="Clear filters"
+                    buttonStyle={{ backgroundColor: "#106304" }}
+                    onPress={async () => {
+                      this.state.categoryid = -1
+                      this.state.maxvalue = -1
+                      this.state.data = this.state.backup_data
+                      this.setState({
+                        categoryid: -1, maxvalue: -1, minvalue: 0,
+                        category: '',
+                        data: this.state.backup_data
+                      })
+                      this.setState({ filtermodalVisible: !this.state.filtermodalVisible });
+                      await this.renderMyData();
+                    }}
+                  />
+                </View>
+              ) : null
+              }
               <View style={styles.inputContainer}>
                 <TouchableHighlight
                   onPress={() => {
@@ -784,6 +849,7 @@ export default class MarketPlaceScreen extends React.Component {
                   );
                 }
                 const item = post.item;
+                console.log(item)
                 return (
                   <View style={styles.card}>
                     <ImageSlider
@@ -820,7 +886,7 @@ export default class MarketPlaceScreen extends React.Component {
                     <View style={styles.cardHeader}>
                       <View>
                         <Text style={styles.title}>{item.title}</Text>
-                        <Text style={styles.price}>${item.price}</Text>
+                        <Text style={styles.price}>${item.adjusted_price == 0 ? item.asking_price : item.adjusted_price}</Text>
                         <Button
                           title="More Details"
                           type="outline"
@@ -866,10 +932,10 @@ export default class MarketPlaceScreen extends React.Component {
                               titleStyle={styles.detail_button_input}
                               type="outline"
                               onPress={() => this.remove_from_favroite(item.id)}
-                              title="Remove from Favourite"
+                              title="Remove from Favourites"
                             /> :
                             <Button
-                              title="Add to Favourite"
+                              title="Add to Favourites"
                               type="outline"
                               onPress={() => {
                                 item.id !== "" ? this.add_to_wishlist(item) : "";
@@ -940,6 +1006,7 @@ export default class MarketPlaceScreen extends React.Component {
                   );
                 }
                 const item = post.item;
+                console.log(item, 'sssssssssssssss')
                 return (
                   <View style={styles.cardGroup}>
                     <ImageSlider
@@ -996,7 +1063,7 @@ export default class MarketPlaceScreen extends React.Component {
                                 style={styles.socialBarButton}
                                 onPress={() => {
                                   item.id !== ""
-                                    ? this.setModalVisible(true)
+                                    ? this.buyNowItem(item)
                                     : "";
                                 }}
                               >

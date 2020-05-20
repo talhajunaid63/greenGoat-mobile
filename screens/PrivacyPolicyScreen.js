@@ -17,7 +17,7 @@ export default class PrivacyPolicyScreen extends Component {
             />
           }
           centerComponent={{
-            text: this.props.navigation.state.routeName,
+            text: 'Privacy Policy',
             style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
           }}
         />

@@ -151,7 +151,7 @@ export default class WishListScreen extends React.Component {
             />
           }
           centerComponent={{
-            text: "Favourite",
+            text: "Favourites",
             style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
           }}
         />
@@ -172,7 +172,7 @@ export default class WishListScreen extends React.Component {
           //   <Icon name="add" color="#fff" onPress={() => this.addMore()} />
           // }
           centerComponent={{
-            text: "Favourite",
+            text: "Favourites",
             style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
           }}
         />
@@ -220,7 +220,7 @@ export default class WishListScreen extends React.Component {
                   marginLeft: -15
                 }}
               >
-                Add To Favourite
+                Add To Favourites
               </Text>
               <View>
                 <Text></Text>
@@ -454,7 +454,7 @@ export default class WishListScreen extends React.Component {
                         type="ionicon"
                       />
                     }
-                    title="Remove from Favourite"
+                    title="Remove from Favourites"
                   />
                 </View>
               </View>

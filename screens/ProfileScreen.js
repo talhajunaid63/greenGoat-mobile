@@ -69,7 +69,6 @@ export default class ProfileScreen extends React.Component {
 
         }
         else {
-
           return response.json()
         }
       }

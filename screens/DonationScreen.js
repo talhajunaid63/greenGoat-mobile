@@ -474,7 +474,7 @@ const typeData = [
   { id: "gut", name: "Gut Renovation" },
   { id: "full", name: "Complete Demolition" }, // set default checked for render option item
   { id: "kitchen", name: "Kitchen/Bath Renovation" },
-  { id: "other", name: "Other" }
+  { id: "other", name: "Other… we’ll need more details later" }
 ];
 
 class step0 extends Component {
@@ -560,7 +560,7 @@ class step1 extends Component {
       <View>
         <Text style={styles.donation_form_title}>
           {" "}
-          Please enter your project's address {" "}
+          Enter your project address {" "}
         </Text>
         <View style={{ marginTop: 20 }}>
           <Input
@@ -669,7 +669,7 @@ export class step2 extends Component {
         this.setState({
           iszipError: true,
           loading: false,
-          zipError: "unable to find data please try again"
+          zipError: "Let’s get a Zip Code"
         });
       });
   };
@@ -679,15 +679,15 @@ export class step2 extends Component {
       <View>
         {this.state.showfeilds && !this.state.iszipError && <Text style={styles.donation_form_title}>
           {" "}
-          Please see the information below, proceed if correct{" "}
+          Does this look correct?{" "}
         </Text>}
         {!this.state.showfeilds && <Text style={styles.donation_form_title}>
           {" "}
-          Please enter your Zip Code{" "}
+          Enter project zip code{" "}
         </Text>}
         <View style={{ marginTop: 20 }}>
           <Input
-            placeholder="Zip"
+            placeholder="zip code"
             placeholderTextColor="white"
             style={{ width: "70%" }}
             onSubmitEditing={() => this.getCityAndZip()}
@@ -855,7 +855,7 @@ export class step3 extends Component {
       <View>
         <Text style={styles.donation_form_title}>
           {" "}
-          Please select type of your project
+          Please select your project type
         </Text>
         <View>
           {/* <Picker
@@ -880,7 +880,7 @@ export class step3 extends Component {
               borderColor: this.state.error == true ? "red" : "#d9d9e0"
             }}
             colorTheme="#5EA64A"
-            popupTitle="Please select type of your project"
+            popupTitle="Please select your project type"
             title="Please select type of your project"
             data={typeData}
             selectButtonText="Choose"
@@ -965,7 +965,7 @@ export class step4 extends Component {
             marginTop: 15
           }}
         >
-          <Text style={{ color: "red" }}>This is not an appraisal</Text>
+          <Text style={{ color: "red" }}>We need to clarify: this is *not* an appraisal</Text>
         </View>
         <View style={styles.stepsbtnContainer}>
           <TouchableOpacity onPress={this.props.back} style={styles.btnStyle}>

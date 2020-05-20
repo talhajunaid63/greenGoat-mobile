@@ -1,7 +1,7 @@
 import { Body, Container, Content, Header, Icon, Thumbnail } from "native-base";
 import React from "react";
 import { ActivityIndicator, AsyncStorage, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Button } from "react-native-elements";
+import { Button, Avatar } from "react-native-elements";
 import { getStatusBarHeight } from "react-native-status-bar-height";
 import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import { createDrawerNavigator, DrawerNavigatorItems } from "react-navigation-drawer";
@@ -19,6 +19,8 @@ import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import WishListScreen from "../screens/WishListScreen";
 import MainTabNavigator from "./MainTabNavigator";
+import UserAvatar from "react-native-user-avatar";
+
 
 
 class GetStartedScreen extends React.Component {
@@ -65,6 +67,7 @@ class AuthLoadingScreen extends React.Component {
   state = {
     firstName: "",
     lastName: "",
+    Image: ''
   }
   constructor() {
     super();
@@ -85,7 +88,10 @@ class AuthLoadingScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        this.setState({ firstname: responseJson["firstname"], lastname: responseJson["lastname"] });
+        AsyncStorage.setItem('firstName', responseJson["firstname"])
+        AsyncStorage.setItem('lastName', responseJson['lastname'])
+        AsyncStorage.setItem('userImage', responseJson['image'])
+        this.setState({ firstname: responseJson["firstname"], lastname: responseJson["lastname"], Image: responseJson['image'] });
 
       })
       .catch(error => {
@@ -141,14 +147,33 @@ DashboardStackNavigator.navigationOptions = {
   drawerIcon: ({ tintColor }) => <Icon name="home" type="FontAwesome" />
 };
 
+
+
 const CustomDrawer = (props) => {
+  function renderimage() {
+    console.log(Global.img)
+    if (Global.img !== 'ok' && Global.img != null) {
+      return (
+        <Avatar
+          rounded
+          size="xlarge"
+          source={{ uri: BASE_URL + Global.img }}
+        />
+      );
+    } else {
+      name = Global.firstName + " " + Global.lastName;
+      return <UserAvatar size="130" name={name} />;
+    }
+  }
+
 
   return (
     <Container>
       <Header style={{ height: 200, backgroundColor: "#089D37" }}>
         <Body style={styles.drawer_header}>
-          <Thumbnail large source={require("../assets/images/logo-half.png")} />
-          {Global.username && <Text style={{ color: "white", paddingTop: 10 }}>{Global.username}</Text>}
+          {/* <Thumbnail large source={require("../assets/images/logo-half.png")} /> */}
+          <View style={styles.avatar}>{Global.username != "ok" && renderimage()}</View>
+          {Global.username && <Text style={{ color: "white", paddingTop: 10 }}>{Global.firstName} {Global.lastName}</Text>}
         </Body>
       </Header>
       <Content>
@@ -176,19 +201,19 @@ const AppDrawerNavigator = createDrawerNavigator(
     Profile: {
       screen: ProfileScreen
     },
-    Favourite: {
+    Favourites: {
       screen: WishListScreen
     },
-    AboutUs: {
+    "About Us": {
       screen: AboutUsScreen
     },
-    ContactUs: {
+    "Contact Us": {
       screen: ContactUsScreen
     },
     Settings: {
       screen: SettingsScreen
     },
-    PrivacyPolicy: {
+    "Privacy Policy": {
       screen: PrivacyPolicyScreen
     },
     Wishlist: {

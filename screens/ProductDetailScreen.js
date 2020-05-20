@@ -135,7 +135,7 @@ export default class ProductDetailScreen extends React.Component {
       },
       body: JSON.stringify({
         "order": {
-          "amount": this.selectedItem.price,
+          "amount": this.selectedItem.adjusted_price != 0 ? this.selectedItem.adjusted_price : this.selectedItem.asking_price,
           "token": token,
           "order_type": "item",
           "id": this.selectedItem.id
@@ -402,7 +402,7 @@ export default class ProductDetailScreen extends React.Component {
               }}
             />
             <Text style={styles.name}>{item.title}</Text>
-            <Text style={styles.price}>${item.price}</Text>
+            <Text style={styles.price}>${item.adjusted_price == 0 ? item.asking_price : item.adjusted_price}</Text>
             <Text style={styles.description}>{item.description}</Text>
           </View>
 

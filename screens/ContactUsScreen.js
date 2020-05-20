@@ -19,27 +19,35 @@ export default class ContactUsScreen extends Component {
   // }
 
   contactus = async () => {
-    fetch(BASE_URL + "contact-us", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "access-token": await AsyncStorage.getItem("userToken"),
-        uid: await AsyncStorage.getItem("uid"),
-        client: await AsyncStorage.getItem("client")
-      },
-      body: JSON.stringify({
-        email: this.state.email,
-        query: this.state.query
-      })
-    })
-      .then(response => response.json())
-      .then(responseJson => {
-        Alert.alert("Thanks for reaching out, our team will contact you soon");
-      })
+    if (this.state.query != "" && this.state.query.length > 10) {
 
-      .catch(error => {
-        console.error(error);
-      });
+      fetch(BASE_URL + "contact-us", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "access-token": await AsyncStorage.getItem("userToken"),
+          uid: await AsyncStorage.getItem("uid"),
+          client: await AsyncStorage.getItem("client")
+        },
+        body: JSON.stringify({
+          email: this.state.email,
+          query: this.state.query
+        })
+      })
+        .then(response => response.json())
+        .then(responseJson => {
+          this.setState({ query: '' })
+          Alert.alert("Thanks for reaching out, our team will contact you soon");
+        })
+
+        .catch(error => {
+          console.error(error);
+        });
+    }
+    else {
+      Alert.alert('Field Error', "Query Field is Required");
+
+    }
   };
 
   render() {
@@ -55,7 +63,7 @@ export default class ContactUsScreen extends Component {
             />
           }
           centerComponent={{
-            text: this.props.navigation.state.routeName,
+            text: "Contact Us",
             style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
           }}
         />
@@ -94,6 +102,7 @@ export default class ContactUsScreen extends Component {
               onChangeText={text => this.setState({ query: text })}
               placeholder="Enter your message"
             />
+            <Text style={styles.inquire}> We try to get back to inquiries within 48 hours</Text>
           </View>
 
           <View style={styles.paragraph}>
@@ -131,6 +140,12 @@ const styles = StyleSheet.create({
   paragraph: {
     padding: 10,
     fontSize: 20,
+    justifyContent: "center"
+  },
+  inquire: {
+    padding: 10,
+    fontSize: 16,
+    opacity: 0.8,
     justifyContent: "center"
   }
 });

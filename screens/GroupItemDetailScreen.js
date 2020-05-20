@@ -264,7 +264,7 @@ export default class GroupItemDetailScreen extends React.Component {
 
           <View style={styles.separator}></View>
           <View style={{ alignItems: "center" }}>
-            <Text style={styles.price}>Group price: ${this.state.price}</Text>
+            <Text style={styles.price}>Package Price: ${this.state.price}</Text>
           </View>
 
           <View style={styles.addToCarContainer}>
@@ -272,7 +272,7 @@ export default class GroupItemDetailScreen extends React.Component {
               style={styles.shareButton}
               onPress={() => this.setModalVisible(true)}
             >
-              <Text style={styles.shareButtonText}>Buy Group Now</Text>
+              <Text style={styles.shareButtonText}>Buy Package</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

@@ -136,6 +136,10 @@ export default class HomeScreen extends React.Component {
     async getName() {
         let name = await AsyncStorage.getItem("user_name")
         Global.username = name
+        Global.firstName = await AsyncStorage.getItem('firstName');
+        Global.lastName = await AsyncStorage.getItem('lastName')
+        Global.img = await AsyncStorage.getItem('img')
+
     }
     componentDidMount() {
         //this.remove_from_wishlist();
@@ -199,8 +203,7 @@ export default class HomeScreen extends React.Component {
                     <View style={styles.home_button}>
                         <View style={{ marginBottom: 20 }}>
                             <Text style={{ color: "white", textAlign: "center", fontSize: 20 }}>
-                                To get an estimate of your materials and their value, we'll use the
-                                greenGoat database to get you some numbers. Ready?
+                                To estimate your material value, we will ask the greenGoat database, if *you* tap “What’s My Stuff Worth”!.
                         </Text>
                         </View>
                         <Button
