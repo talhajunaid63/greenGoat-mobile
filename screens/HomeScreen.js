@@ -151,9 +151,6 @@ export default class HomeScreen extends React.Component {
         this.getName()
     }
 
-    componentWillMount() {
-        // this.renderMyData();
-    }
 
     async renderMyData() {
         fetch(BASE_URL + 'home_images', {

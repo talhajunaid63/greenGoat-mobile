@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, ImageBackground, View } from 'react-native';
 import { Button } from 'react-native-elements';
 
-class GetStartedScreen extends React.Component {
+export default class GetStartedScreen extends React.Component {
   static navigationOptions = {
     title: 'GetStarted',
   };

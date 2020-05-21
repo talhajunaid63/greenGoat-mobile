@@ -1,24 +1,15 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  ImageBackground,
-  ActivityIndicator,
-  AsyncStorage
-} from "react-native";
-import { createBottomTabNavigator } from "react-navigation-tabs";
-import { createStackNavigator } from "react-navigation-stack";
-import { createMaterialBottomTabNavigator } from "react-navigation-material-bottom-tabs";
+import { View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-
-import MarketPlaceScreen from "../screens/MarketPlaceScreen";
+import { createMaterialBottomTabNavigator } from "react-navigation-material-bottom-tabs";
+import { createStackNavigator } from "react-navigation-stack";
 import ActivityScreen from "../screens/ActivityScreen";
 import DonationScreen from "../screens/DonationScreen";
-import ProductDetailScreen from "../screens/ProductDetailScreen";
 import GroupItemDetailScreen from "../screens/GroupItemDetailScreen";
 import HomeScreen from "../screens/HomeScreen";
+import MarketPlaceScreen from "../screens/MarketPlaceScreen";
+import ProductDetailScreen from "../screens/ProductDetailScreen";
+
 
 const MarketPlaceStack = createStackNavigator(
   {

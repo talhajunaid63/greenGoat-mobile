@@ -665,14 +665,14 @@ export default class MarketPlaceScreen extends React.Component {
               <View style={styles.inputContainer}>
                 <Text>Minimum Price: ${this.state.minvalue}</Text>
                 <Slider
-                  value={this.state.minvalue == 0 ? 0 : this.state.minvalue}
+                  value={this.state.minvalue}
                   onValueChange={value => {
                     value < this.state.maxvalue ?
                       this.setState({ minvalue: value }) :
-                      this.setState({ minvalue: 0 })
+                      this.setState({ minvalue: value - this.state.maxvalue })
                   }
                   }
-                  maximumValue={1000}
+                  maximumValue={this.state.maxvalue > 0 ? this.state.maxvalue - 500 : 1000}
                   thumbTintColor="#5EA64A"
                   step={1}
                 />
@@ -762,10 +762,11 @@ export default class MarketPlaceScreen extends React.Component {
                     buttonStyle={{ backgroundColor: "#106304" }}
                     onPress={async () => {
                       this.state.categoryid = -1
-                      this.state.maxvalue = -1
+                      this.state.maxvalue = 10000
+                      this.state.minvalue = 0
                       this.state.data = this.state.backup_data
                       this.setState({
-                        categoryid: -1, maxvalue: -1, minvalue: 0,
+                        categoryid: -1, maxvalue: 10000, minvalue: 0,
                         category: '',
                         data: this.state.backup_data
                       })
