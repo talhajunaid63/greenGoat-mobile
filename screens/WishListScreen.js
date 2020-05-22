@@ -120,7 +120,7 @@ export default class WishListScreen extends React.Component {
       .then(response => response.json())
       .then(responseJson => {
 
-        Alert.alert("Product removed from wish list");
+        Alert.alert("Product removed from favourites");
         this.renderMyData();
       })
 
@@ -141,20 +141,27 @@ export default class WishListScreen extends React.Component {
       );
     } else if (Object.keys(this.state.data).length == 0) {
       return (
-        <Header
-          backgroundColor={"#089D37"}
-          leftComponent={
-            <Icon
-              name="menu"
-              color="#fff"
-              onPress={() => this.props.navigation.openDrawer()}
-            />
-          }
-          centerComponent={{
-            text: "Favourites",
-            style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
-          }}
-        />
+        <View>
+          <Header
+            backgroundColor={"#089D37"}
+            leftComponent={
+              <Icon
+                name="menu"
+                color="#fff"
+                onPress={() => this.props.navigation.openDrawer()}
+              />
+            }
+            centerComponent={{
+              text: "Favourites",
+              style: { color: "#fff", fontWeight: "bold", fontSize: 20 }
+            }}
+          />
+          <View style={styles.emptyContainer} >
+            <Text style={{ fontSize: 20, fontWeight: "bold", paddingHorizontal: 20, marginTop: 20 }}>
+              There are no favourite items
+                      </Text>
+          </View>
+        </View>
       );
     }
     return (

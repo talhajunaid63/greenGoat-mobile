@@ -18,7 +18,7 @@ export default class ProductDetailScreen extends React.Component {
         ["Dimensions", item.width + "x" + item.height],
         ["Weight", item.weight],
         ["Category", item.category],
-        ["Location", item.location],
+        ["Location", item.address],
         ["Depth", item.depth],
         ["Serial", item.serial],
         ["Count", item.count],
@@ -261,6 +261,7 @@ export default class ProductDetailScreen extends React.Component {
 
   render() {
     const item = this.props.navigation.state.params.item;
+    console.log('ssssssss', item)
     const fav = this.state.fav_product_ids && this.state.fav_product_ids.find(element => element == item.id);
     return (
       <View style={styles.container}>
@@ -325,9 +326,9 @@ export default class ProductDetailScreen extends React.Component {
                   <Button
                     title="Buy"
                     icon={
-                      <Icon1
-                        name="shopping-cart"
-                        style={{ marginLeft: 30, marginTop: 10 }}
+                      <Icon
+                        name="ios-cart"
+                        style={{ marginLeft: 10, marginTop: 8 }}
                         size={17}
                         color="black"
                       />

@@ -158,7 +158,6 @@ export default class MarketPlaceScreen extends React.Component {
     console.log(await AsyncStorage.getItem("userToken"),
       await AsyncStorage.getItem("uid"),
       await AsyncStorage.getItem("client"))
-    debugger
     fetch(url, {
       method: "GET",
       headers: {
@@ -171,7 +170,6 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        debugger
         // this.setState({ name : responseJson["name"] })
         // this.setState({ email : responseJson["email"] })
         Promise.resolve(this.get_group_items())
@@ -422,7 +420,6 @@ export default class MarketPlaceScreen extends React.Component {
     this.setState({ category: vall, categoryid: selectedid });
   };
   getPaymentDone = async (token) => {
-    console.log(this.selectedItem.adjusted_price, 'ssssssss', this.selectedItem.asking_price)
     var price = 0
     var type = ''
     if (this.selectedItem.product_ids) {
@@ -553,7 +550,6 @@ export default class MarketPlaceScreen extends React.Component {
   buyNowItem(item) {
     console.log(item);
     this.selectedItem = item
-    debugger
     this.setModalVisible(true)
   }
   render() {
@@ -666,13 +662,10 @@ export default class MarketPlaceScreen extends React.Component {
                 <Text>Minimum Price: ${this.state.minvalue}</Text>
                 <Slider
                   value={this.state.minvalue}
-                  onValueChange={value => {
-                    value < this.state.maxvalue ?
-                      this.setState({ minvalue: value }) :
-                      this.setState({ minvalue: value - this.state.maxvalue })
-                  }
-                  }
-                  maximumValue={this.state.maxvalue > 0 ? this.state.maxvalue - 500 : 1000}
+                  minimumValue={0}
+                  maximumValue={1000}
+                  onValueChange={value => this.setState({ minvalue: value })}
+                  // maximumValue={this.state.maxvalue > 100 ? this.state.maxvalue - 100 : 0}
                   thumbTintColor="#5EA64A"
                   step={1}
                 />
@@ -682,6 +675,7 @@ export default class MarketPlaceScreen extends React.Component {
                 <Text>Maximum Price: ${this.state.maxvalue}</Text>
                 <Slider
                   value={this.state.maxvalue}
+                  minimumValue={1001}
                   onValueChange={value => this.setState({ maxvalue: value })}
                   maximumValue={10000}
                   thumbTintColor="#5EA64A"
@@ -850,7 +844,6 @@ export default class MarketPlaceScreen extends React.Component {
                   );
                 }
                 const item = post.item;
-                console.log(item)
                 return (
                   <View style={styles.card}>
                     <ImageSlider
@@ -1007,7 +1000,6 @@ export default class MarketPlaceScreen extends React.Component {
                   );
                 }
                 const item = post.item;
-                console.log(item, 'sssssssssssssss')
                 return (
                   <View style={styles.cardGroup}>
                     <ImageSlider

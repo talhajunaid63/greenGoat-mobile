@@ -4,8 +4,12 @@ import { Alert, AsyncStorage, FlatList, Image, Modal, ScrollView, StyleSheet, Te
 import { CreditCardInput } from "react-native-credit-card-input";
 import { Button } from "react-native-elements";
 import ImageSlider from "react-native-image-slider";
+import { Icon as Icon1 } from "react-native-elements";
+
 import { Rows, Table } from "react-native-table-component";
 import { BASE_URL } from "../config/NetworkConstants";
+import back from "../assets/images/back.png";
+
 
 export default class GroupItemDetailScreen extends React.Component {
   constructor(props) {
@@ -126,7 +130,9 @@ export default class GroupItemDetailScreen extends React.Component {
   };
 
   render() {
-    const item = this.props.navigation.state.params.item;
+    const itemss = this.props.navigation.state.params.item;
+    console.log(itemss, 'itemsssssssssssssssssssssssss')
+
     return (
       <View style={styles.container}>
         <ScrollView>
@@ -136,12 +142,50 @@ export default class GroupItemDetailScreen extends React.Component {
             visible={this.state.modalVisible}
             onRequestClose={() => { }}
           >
-            <View
-              style={{ paddingTop: 22, backgroundColor: "#8deb73", flex: 1 }}
-            >
-              <Text style={{ fontWeight: "bold", textAlign: "center" }}>
-                Buy Now
-              </Text>
+            <View style={{ backgroundColor: "#8deb73", flex: 1 }}>
+              <View
+                style={{
+                  width: "100%",
+                  height: 70,
+                  backgroundColor: "#089D37",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingHorizontal: 20,
+                  paddingTop: 20,
+                  display: "flex",
+                  flexDirection: "row"
+                }}
+              >
+                {/* <Icon
+                style={{ paddingLeft: 20 }}
+                onPress={() => navigation.goBack()}
+                name="left"
+                color="#FFF"
+                size={30}
+              /> */}
+                <TouchableOpacity
+                  onPress={() => {
+                    this.setModalVisible(!this.state.modalVisible);
+                  }}
+                  style={{ width: 25, height: 25 }}
+                >
+                  <Image source={back} style={{ width: 25, height: 25 }}></Image>
+                </TouchableOpacity>
+                <Text
+                  style={{
+                    fontWeight: "700",
+                    textAlign: "center",
+                    color: "white",
+                    fontSize: 22,
+                    marginLeft: -15
+                  }}
+                >
+                  Buy Now
+                  </Text>
+                <View>
+                  <Text></Text>
+                </View>
+              </View>
               <View style={{ marginTop: 40 }}>
                 <CreditCardInput
                   requiresPostalCode
@@ -152,8 +196,8 @@ export default class GroupItemDetailScreen extends React.Component {
                     title="Buy"
                     icon={
                       <Icon
-                        name="shopping-cart"
-                        style={{ marginLeft: 30, marginTop: 10 }}
+                        name="ios-cart"
+                        style={{ marginLeft: 10, marginTop: 8 }}
                         size={17}
                         color="black"
                       />
@@ -164,7 +208,7 @@ export default class GroupItemDetailScreen extends React.Component {
                     titleStyle={{ color: "black" }}
                   />
                 </View>
-                <View style={{ marginTop: 30 }}>
+                {/* <View style={{ marginTop: 30 }}>
                   <TouchableHighlight
                     onPress={() => {
                       this.setModalVisible(!this.state.modalVisible);
@@ -173,7 +217,7 @@ export default class GroupItemDetailScreen extends React.Component {
                   >
                     <Text style={{ textAlign: "center" }}>Go Back</Text>
                   </TouchableHighlight>
-                </View>
+                </View> */}
               </View>
             </View>
           </Modal>
@@ -195,8 +239,8 @@ export default class GroupItemDetailScreen extends React.Component {
               const table_data = [
                 ["Dimensions", item.width + "x" + item.height],
                 ["Weight", item.weight],
-                ["Category", item.category],
-                ["Location", item.location],
+                ["Category", itemss[0].category],
+                ["Location", itemss[0].address + " , " + itemss[0].city],
                 ["Depth", item.depth],
                 ["Serial", item.serial]
               ];
@@ -240,7 +284,7 @@ export default class GroupItemDetailScreen extends React.Component {
                       )}
                     />
                     <Text style={styles.name}>{item.title}</Text>
-                    <Text style={styles.price}>${item.price}</Text>
+                    <Text style={styles.price}>${item.asking_price}</Text>
                     <Text style={styles.description}>{item.description}</Text>
                   </View>
                   <View style={{ padding: 5, marginTop: 10 }}>
