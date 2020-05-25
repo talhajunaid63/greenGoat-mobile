@@ -1000,6 +1000,8 @@ export default class MarketPlaceScreen extends React.Component {
                   );
                 }
                 const item = post.item;
+                console.log(item, 'sssggggggggggggggggg')
+
                 return (
                   <View style={styles.cardGroup}>
                     <ImageSlider
@@ -1042,7 +1044,7 @@ export default class MarketPlaceScreen extends React.Component {
                           type="outline"
                           onPress={() =>
                             this.props.navigation.navigate("GroupItemDetail", {
-                              item: item.products,
+                              item: item,
                               group_price: item.price
                             })
                           }

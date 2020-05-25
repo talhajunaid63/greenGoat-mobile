@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Alert, AsyncStorage, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Button, Header, Icon, Input } from "react-native-elements";
 import { BASE_URL } from "../config/NetworkConstants";
+import Loader from "./Loader"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 
@@ -10,7 +11,8 @@ export default class ContactUsScreen extends Component {
     super(props);
     this.state = {
       email: "thegoat@greengoat.org",
-      query: ""
+      query: "",
+      modalShow: false
     };
   }
 
@@ -19,12 +21,13 @@ export default class ContactUsScreen extends Component {
   // }
 
   contactus = async () => {
-    if (this.state.query != "" && this.state.query.length > 10) {
-
-      fetch(BASE_URL + "contact-us", {
+    if (this.state.query != "") {
+      this.setState({ modalShow: true })
+      await fetch(BASE_URL + "contact-us", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: 'application/json',
           "access-token": await AsyncStorage.getItem("userToken"),
           uid: await AsyncStorage.getItem("uid"),
           client: await AsyncStorage.getItem("client")
@@ -34,9 +37,25 @@ export default class ContactUsScreen extends Component {
           query: this.state.query
         })
       })
-        .then(response => response.json())
+        .then(response => {
+          debugger
+          if (response.status === 500) {
+            return response.text()
+          }
+          else if (response.status === 200) {
+            return response.json()
+          }
+          else {
+            alert("Something Went Wrong Please Try again latter")
+            this.setState({ query: '', modalShow: false })
+            // break;
+          }
+        })
         .then(responseJson => {
-          this.setState({ query: '' })
+          console.log(responseJson)
+          debugger
+          this.setState({ query: '', modalShow: false })
+
           Alert.alert("Thanks for reaching out, our team will contact you soon");
         })
 
@@ -53,6 +72,13 @@ export default class ContactUsScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
+        {this.state.modalShow &&
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <Loader
+              LoaderVisibles={this.state.modalShow}
+            />
+          </View>
+        }
         <Header
           backgroundColor={"#089D37"}
           leftComponent={
@@ -98,8 +124,12 @@ export default class ContactUsScreen extends Component {
           /> */}
             <Input
               multiline
+              value={this.state.query}
               numberOfLines={5}
-              onChangeText={text => this.setState({ query: text })}
+              onChangeText={text => {
+                console.log(text)
+                this.setState({ query: text })
+              }}
               placeholder="Enter your message"
             />
             <Text style={styles.inquire}> We try to get back to inquiries within 48 hours</Text>
@@ -109,7 +139,7 @@ export default class ContactUsScreen extends Component {
             <Button
               title="Send"
               buttonStyle={{ backgroundColor: "#089D37" }}
-              onPress={this.contactus}
+              onPress={() => this.contactus()}
             />
           </View>
         </KeyboardAwareScrollView>

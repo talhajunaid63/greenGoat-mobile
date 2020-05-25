@@ -11,6 +11,7 @@ import { BASE_URL } from "../config/NetworkConstants";
 export default class ProductDetailScreen extends React.Component {
   constructor(props) {
     const item = props.navigation.state.params.item;
+
     super(props);
     this.state = {
       imageModal: false,
@@ -120,11 +121,12 @@ export default class ProductDetailScreen extends React.Component {
       });
   };
   buyNowItem(item) {
-    this.setState({ selectedItem: item })
+    this.item = item
     this.setModalVisible(true)
   }
   getPaymentDone = async (token) => {
-
+    console.log(this.item)
+    debugger
     fetch(BASE_URL + "orders", {
       method: "POST",
       headers: {
@@ -135,10 +137,10 @@ export default class ProductDetailScreen extends React.Component {
       },
       body: JSON.stringify({
         "order": {
-          "amount": this.selectedItem.adjusted_price != 0 ? this.selectedItem.adjusted_price : this.selectedItem.asking_price,
+          "amount": this.item.adjusted_price != 0 ? this.item.adjusted_price : this.item.asking_price,
           "token": token,
           "order_type": "item",
-          "id": this.selectedItem.id
+          "id": this.item.id
         }
       }
       )
@@ -147,6 +149,9 @@ export default class ProductDetailScreen extends React.Component {
       .then(responseJson => {
         if (responseJson.message) {
           Alert.alert(responseJson.message)
+          this.setModalVisible(false)
+          this.props.navigation.navigate("MarketPlace")
+
         }
       })
 

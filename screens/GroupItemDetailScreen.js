@@ -13,7 +13,7 @@ import back from "../assets/images/back.png";
 
 export default class GroupItemDetailScreen extends React.Component {
   constructor(props) {
-    const item = props.navigation.state.params.item;
+    const item = props.navigation.state.params.item.products;
     const price = props.navigation.state.params.group_price;
     super(props);
     this.state = {
@@ -31,6 +31,7 @@ export default class GroupItemDetailScreen extends React.Component {
       cvc: "",
       type: "group",
       data: item,
+      id: this.props.navigation.state.params.item.id,
       buy_button_disabled: true,
       price: price
     };
@@ -59,9 +60,12 @@ export default class GroupItemDetailScreen extends React.Component {
     this.setState({ modalVisible: visible });
   }
 
-  send_enquiry = async () => {
-    // Alert.alert('Sorry!! Your request cannot bbe processed right now. Please try again later')
-    fetch(BASE_URL + "checkout", {
+  getPaymentDone = async (token) => {
+    type = "group"
+    price = this.state.price
+    debugger
+
+    await fetch(BASE_URL + "orders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -70,28 +74,100 @@ export default class GroupItemDetailScreen extends React.Component {
         client: await AsyncStorage.getItem("client")
       },
       body: JSON.stringify({
-        number: this.state.number,
-        cvc: this.state.cvc,
-        expiry: this.state.expiry,
-        item_type: this.state.type,
-        id: this.state.data.id,
-        user_id: await AsyncStorage.getItem("user_id"),
-        price: this.state.price,
-        name: await AsyncStorage.getItem("user_name")
-      })
+        "order": {
+          "amount": price,
+          "token": token,
+          "order_type": type,
+          "id": this.state.id
+        }
+      }
+      )
     })
       .then(response => response.json())
-      .then(responseJson => {
-        Alert.alert(responseJson["message"]);
-        this.props.navigation.navigate("MarketPlace");
+      .then(async (responseJson) => {
+        if (responseJson.message) {
+          Alert.alert(responseJson.message)
+          await this.setModalVisible(false);
+          this.props.navigation.navigate('MarketPlace')
+        }
+
       })
 
       .catch(error => {
-        console.error(error);
+        console.log(error);
       });
-
-    this.setModalVisible(!this.state.modalVisible);
   };
+  getCreditCardToken = () => {
+    if (this.state.expiry != null && this.state.number != null) {
+      let expiry = this.state.expiry.split("/")
+
+      const card = {
+        'card[number]': this.state.number,
+        'card[exp_month]': expiry[0],
+        'card[exp_year]': expiry[1],
+        'card[cvc]': this.state.cvc
+      };
+
+      let STRIPE_PUBLISHABLE_KEY = 'pk_test_x7BQNZlks7cWynfPFdrXSnDs'
+      return fetch('https://api.stripe.com/v1/tokens', {
+        headers: {
+          // Use the correct MIME type for your server
+          Accept: 'application/json',
+          // Use the correct Content Type to send data to Stripe
+          'Content-Type': 'application/x-www-form-urlencoded',
+          // Use the Stripe publishable key as Bearer
+          Authorization: `Bearer ${STRIPE_PUBLISHABLE_KEY}`
+        },
+        // Use a proper HTTP method
+        method: 'post',
+        // Format the credit card data to a string of key-value pairs
+        // divided by &
+        body: Object.keys(card)
+          .map(key => key + '=' + card[key])
+          .join('&')
+      }).then(response => response.json()).then((jsonRespone) => {
+        if (jsonRespone.id != null) {
+          this.getPaymentDone(jsonRespone.id)
+        }
+      }).catch((error => {
+        console.log("error i  payment:", error)
+      }));
+    }
+  };
+
+  // send_enquiry = async () => {
+  //   // Alert.alert('Sorry!! Your request cannot bbe processed right now. Please try again later')
+  //   fetch(BASE_URL + "checkout", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       "access-token": await AsyncStorage.getItem("userToken"),
+  //       uid: await AsyncStorage.getItem("uid"),
+  //       client: await AsyncStorage.getItem("client")
+  //     },
+  //     body: JSON.stringify({
+  //       number: this.state.number,
+  //       cvc: this.state.cvc,
+  //       expiry: this.state.expiry,
+  //       item_type: this.state.type,
+  //       id: this.state.data.id,
+  //       user_id: await AsyncStorage.getItem("user_id"),
+  //       price: this.state.price,
+  //       name: await AsyncStorage.getItem("user_name")
+  //     })
+  //   })
+  //     .then(response => response.json())
+  //     .then(responseJson => {
+  //       Alert.alert(responseJson["message"]);
+  //       this.props.navigation.navigate("MarketPlace");
+  //     })
+
+  //     .catch(error => {
+  //       console.error(error);
+  //     });
+
+  //   this.setModalVisible(!this.state.modalVisible);
+  // };
 
   add_to_wishlist = async () => {
     const item = this.props.navigation.state.params.item;
@@ -131,7 +207,7 @@ export default class GroupItemDetailScreen extends React.Component {
 
   render() {
     const itemss = this.props.navigation.state.params.item;
-    console.log(itemss, 'itemsssssssssssssssssssssssss')
+    console.log(this.props.navigation.state.params.item, 'itemsssssssssssssssssssssssss')
 
     return (
       <View style={styles.container}>
@@ -204,7 +280,7 @@ export default class GroupItemDetailScreen extends React.Component {
                     }
                     iconRight
                     buttonStyle={{ backgroundColor: "white" }}
-                    onPress={this.send_enquiry}
+                    onPress={this.getCreditCardToken}
                     titleStyle={{ color: "black" }}
                   />
                 </View>
@@ -239,8 +315,8 @@ export default class GroupItemDetailScreen extends React.Component {
               const table_data = [
                 ["Dimensions", item.width + "x" + item.height],
                 ["Weight", item.weight],
-                ["Category", itemss[0].category],
-                ["Location", itemss[0].address + " , " + itemss[0].city],
+                ["Category", item.category],
+                ["Location", item.address + " , " + item.city],
                 ["Depth", item.depth],
                 ["Serial", item.serial]
               ];

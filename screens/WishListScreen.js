@@ -42,8 +42,14 @@ export default class WishListScreen extends React.Component {
       minvalue: 0,
       maxvalue: 100000,
       progress: false,
-      search: ""
+      search: "",
+      number: "",
+      expiry: "",
+      cvc: "",
+      type: "product",
     };
+    this.selectedItem = null
+
   }
 
   componentWillMount() {
@@ -95,6 +101,99 @@ export default class WishListScreen extends React.Component {
   setAddMoreModalVisible(visible) {
     this.setState({ addMoreModalVisible: visible });
   }
+
+
+  buyNowItem(item) {
+    this.selectedItem = item
+    debugger
+
+    this.setState({ selectedItem: item })
+    this.setModalVisible(true)
+  }
+  getPaymentDone = async (token) => {
+    this.selectedItem
+    console.log(this.state.item)
+    debugger
+    fetch(BASE_URL + "orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "access-token": await AsyncStorage.getItem("userToken"),
+        uid: await AsyncStorage.getItem("uid"),
+        client: await AsyncStorage.getItem("client")
+      },
+      body: JSON.stringify({
+        "order": {
+          "amount": this.selectedItem.adjusted_price != 0 ? this.selectedItem.adjusted_price : this.selectedItem.asking_price,
+          "token": token,
+          "order_type": "item",
+          "id": this.selectedItem.id
+        }
+      }
+      )
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson.message) {
+          Alert.alert(responseJson.message)
+          this.setModalVisible(false)
+          this.renderMyData()
+
+        }
+      })
+
+      .catch(error => {
+        console.log(error);
+      });
+  };
+  getCreditCardToken = () => {
+    if (this.state.expiry != null && this.state.number != null) {
+      let expiry = this.state.expiry.split("/")
+      const card = {
+        'card[number]': this.state.number,
+        'card[exp_month]': expiry[0],
+        'card[exp_year]': expiry[1],
+        'card[cvc]': this.state.cvc
+      };
+
+      let STRIPE_PUBLISHABLE_KEY = 'pk_test_x7BQNZlks7cWynfPFdrXSnDs'
+      return fetch('https://api.stripe.com/v1/tokens', {
+        headers: {
+          // Use the correct MIME type for your server
+          Accept: 'application/json',
+          // Use the correct Content Type to send data to Stripe
+          'Content-Type': 'application/x-www-form-urlencoded',
+          // Use the Stripe publishable key as Bearer
+          Authorization: `Bearer ${STRIPE_PUBLISHABLE_KEY}`
+        },
+        // Use a proper HTTP method
+        method: 'post',
+        // Format the credit card data to a string of key-value pairs
+        // divided by &
+        body: Object.keys(card)
+          .map(key => key + '=' + card[key])
+          .join('&')
+      }).then(response => response.json()).then((jsonRespone) => {
+        if (jsonRespone.id != null) {
+          this.getPaymentDone(jsonRespone.id)
+        }
+      }).catch((error => {
+        console.log("error i  payment:", error)
+      }));
+    }
+  };
+
+  _onCardChange = form => {
+    // console.log(form);
+
+    this.setState({
+      buy_button_disabled: false,
+      number: form["values"]["number"],
+      cvc: form["values"]["cvc"],
+      expiry: form["values"]["expiry"]
+    });
+
+  };
 
   send_enquiry = () => {
     this.setModalVisible(!this.state.modalVisible);
@@ -323,7 +422,7 @@ export default class WishListScreen extends React.Component {
               </View>
             </View>
             <View style={{ marginTop: 40 }}>
-              <CreditCardInput requiresPostalCode onChange={this._onChange} />
+              <CreditCardInput requiresPostalCode onChange={this._onCardChange} />
               <View style={{ margin: 30 }}>
                 <Button
                   title="Buy"
@@ -337,7 +436,7 @@ export default class WishListScreen extends React.Component {
                   }
                   iconRight
                   buttonStyle={{ backgroundColor: "white" }}
-                  onPress={this.send_enquiry}
+                  onPress={this.getCreditCardToken}
                   titleStyle={{ color: "black" }}
                 />
               </View>
@@ -427,7 +526,10 @@ export default class WishListScreen extends React.Component {
                     <View style={styles.socialBarSection}>
                       <TouchableOpacity
                         style={styles.socialBarButton}
-                        onPress={() => this.setModalVisible(true)}
+                        onPress={() => {
+                          // this.selectedItem = item
+                          this.buyNowItem(item)
+                        }}
                       >
                         <Icon
                           style={styles.icon}
