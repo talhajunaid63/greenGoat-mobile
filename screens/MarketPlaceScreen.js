@@ -98,13 +98,13 @@ export default class MarketPlaceScreen extends React.Component {
     this.selectedItem = null
   }
 
-  UNSAFE_componentWillMount() {
+  async UNSAFE_componentWillMount() {
     const { navigation } = this.props;
-    this.focusListener = navigation.addListener("didFocus", () => {
-      this.renderMyData();
-      this.get_group_items();
-      this.get_categories_data();
-      this.get_fav_product();
+    this.focusListener = navigation.addListener("didFocus", async () => {
+      await this.renderMyData();
+      await this.get_group_items();
+      await this.get_categories_data();
+      await this.get_fav_product();
     });
   }
 
@@ -985,6 +985,15 @@ export default class MarketPlaceScreen extends React.Component {
               data={this.state.group_items}
               horizontal={false}
               numColumns={2}
+              ListEmptyComponent={() => {
+                return (<View style={styles.emptyContainer} >
+                  <Text style={{ fontSize: 20, fontWeight: "bold", paddingHorizontal: 20, marginTop: 20 }}>
+                    There are no package deals currently
+                          </Text>
+                </View>
+                )
+
+              }}
               keyExtractor={item => {
                 return item.id;
               }}
@@ -1001,12 +1010,20 @@ export default class MarketPlaceScreen extends React.Component {
                 }
                 const item = post.item;
                 console.log(item, 'sssggggggggggggggggg')
-
+                // if (this.state.group_items.length == 0) {
+                //   return (<View style={styles.emptyContainer} >
+                //     <Text style={{ fontSize: 20, fontWeight: "bold", paddingHorizontal: 20, marginTop: 20 }}>
+                //       There are no favourite items
+                //             </Text>
+                //   </View>
+                //   )
+                // }
+                // else {
                 return (
                   <View style={styles.cardGroup}>
                     <ImageSlider
                       style={styles.productImg}
-                      images={item.products[0].images}
+                      images={item.images}
                       customSlide={({ index, item, style, width }) => (
                         // It's important to put style here because it's got offset inside
                         <View
@@ -1114,6 +1131,7 @@ export default class MarketPlaceScreen extends React.Component {
                     </View>
                   </View>
 
+
                   // <View style={styles.cardGroup}>
                   //   <ImageSlider
                   //     style={styles.productImg}
@@ -1194,6 +1212,7 @@ export default class MarketPlaceScreen extends React.Component {
                   //   </View>
                   // </View>
                 );
+                // }
               }}
             />
           </Tab>
@@ -1217,6 +1236,11 @@ const styles = StyleSheet.create({
   separator: {
     marginTop: 10
   },
+  emptyContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
   /******** card **************/
   card: {
     shadowOffset: { width: 10, height: 10 },
