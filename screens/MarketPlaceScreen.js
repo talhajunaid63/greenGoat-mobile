@@ -982,7 +982,7 @@ export default class MarketPlaceScreen extends React.Component {
             <FlatList
               style={styles.list}
               contentContainerStyle={styles.listContainer}
-              data={this.state.group_items}
+              data={this.state.group_items ? this.state.group_items : []}
               horizontal={false}
               numColumns={2}
               ListEmptyComponent={() => {
@@ -1000,7 +1000,7 @@ export default class MarketPlaceScreen extends React.Component {
               ItemSeparatorComponent={() => {
                 return <View style={styles.separator} />;
               }}
-              renderItem={post => {
+              renderItem={(post, index) => {
                 if (this.state.progress == false) {
                   return (
                     <View style={{ marginTop: 200 }}>
@@ -1008,92 +1008,90 @@ export default class MarketPlaceScreen extends React.Component {
                     </View>
                   );
                 }
-                const item = post.item;
-                console.log(item, 'sssggggggggggggggggg')
-                // if (this.state.group_items.length == 0) {
-                //   return (<View style={styles.emptyContainer} >
-                //     <Text style={{ fontSize: 20, fontWeight: "bold", paddingHorizontal: 20, marginTop: 20 }}>
-                //       There are no favourite items
-                //             </Text>
-                //   </View>
-                //   )
-                // }
-                // else {
-                return (
-                  <View style={styles.cardGroup}>
-                    <ImageSlider
-                      style={styles.productImg}
-                      images={item.images}
-                      customSlide={({ index, item, style, width }) => (
-                        // It's important to put style here because it's got offset inside
-                        <View
-                          key={index}
-                          style={[
-                            style,
-                            {
-                              width: 200,
-                              height: 200,
-                              borderTopLeftRadius: 10,
-                              borderTopRightRadius: 10,
-                              backgroundColor: "white"
-                            }
-                          ]}
-                        >
-                          <Image
-                            source={{ uri: item }}
-                            style={{
-                              width: 200,
-                              height: 200,
-                              borderTopLeftRadius: 10,
-                              borderTopRightRadius: 10,
-                            }}
-                          />
-                        </View>
-                      )}
-                    />
+                else {
+                  const item = post.item;
+                  let images = []
+                  item && item.products.map((item) => {
+                    item.images && item.images.map(itm => {
+                      images.push(itm)
+                    })
+                  })
+                  return (
+                    <View style={styles.cardGroup}>
+                      <ImageSlider
+                        style={styles.productImg}
+                        images={images && images}
+                        // images={item.products[0].images && item.products[0].images}
+                        customSlide={({ index, item, style, width }) => (
+                          // It's important to put style here because it's got offset inside
+                          <View
+                            key={index}
+                            style={[
+                              style,
+                              {
+                                width: 200,
+                                height: 200,
+                                borderTopLeftRadius: 10,
+                                borderTopRightRadius: 10,
+                                backgroundColor: "white"
+                              }
+                            ]}
+                          >
+                            <Image
+                              source={{ uri: item }}
+                              style={{
+                                width: 200,
+                                height: 200,
+                                borderTopLeftRadius: 10,
+                                borderTopRightRadius: 10,
+                              }}
+                            />
+                          </View>
+                        )}
+                      />
 
-                    <View style={styles.cardHeader}>
-                      <View>
-                        <Text style={styles.title}>{item.title}</Text>
-                        <Text style={styles.price}>${item.price}</Text>
-                        <Button
-                          title="More Details"
-                          type="outline"
-                          onPress={() =>
-                            this.props.navigation.navigate("GroupItemDetail", {
-                              item: item,
-                              group_price: item.price
-                            })
-                          }
-                          buttonStyle={styles.detail_button}
-                          titleStyle={styles.detail_button_input}
-                        />
-                        <View style={styles.cardFooter}>
-                          <View style={styles.socialBarContainer}>
-                            <View style={styles.socialBarSection}>
-                              <TouchableOpacity
-                                style={styles.socialBarButton}
-                                onPress={() => {
-                                  item.id !== ""
-                                    ? this.buyNowItem(item)
-                                    : "";
-                                }}
-                              >
-                                <Icon
-                                  style={styles.icon}
-                                  name="shopping-cart"
-                                  color="#64707a"
-                                />
-                                <Text
-                                  style={[styles.socialBarLabel, styles.buyNow]}
+                      <View style={styles.cardHeader}>
+                        <View>
+                          <Text style={styles.title}>{item.title && item.title}</Text>
+                          <Text style={styles.price}>${item.price && item.price}</Text>
+                          <Button
+                            title="More Details"
+                            type="outline"
+                            onPress={() =>
+                              this.props.navigation.navigate("GroupItemDetail", {
+                                item: item,
+                                group_price: item.price
+                              })
+                            }
+                            buttonStyle={styles.detail_button}
+                            titleStyle={styles.detail_button_input}
+                          />
+                          <View style={styles.cardFooter}>
+                            <View style={styles.socialBarContainer}>
+                              <View style={styles.socialBarSection}>
+                                <TouchableOpacity
+                                  style={styles.socialBarButton}
+                                  onPress={() => {
+                                    item.id !== ""
+                                      ? this.buyNowItem(item)
+                                      : "";
+                                  }}
                                 >
-                                  Buy Now
+                                  <Icon
+                                    style={styles.icon}
+                                    name="shopping-cart"
+                                    color="#64707a"
+                                  />
+                                  <Text
+                                    style={[styles.socialBarLabel, styles.buyNow]}
+                                  >
+                                    Buy Now
                                 </Text>
-                              </TouchableOpacity>
+                                </TouchableOpacity>
+                              </View>
                             </View>
                           </View>
-                        </View>
-                        {/* {
+                          {/* {
                           this.state.fav_product_ids && this.state.fav_product_ids.find(function (element) {
                             return element == item.id;
                           }) ?
@@ -1116,104 +1114,106 @@ export default class MarketPlaceScreen extends React.Component {
                               titleStyle={styles.detail_button_input}
                             />
                         } */}
+                        </View>
                       </View>
-                    </View>
 
-                    <View style={styles.cardFooter}>
-                      <View style={styles.socialBarContainer}>
-                        <View style={styles.socialBarSection}>
-                          {/* <TouchableOpacity style={styles.socialBarButton} onPress={() => this.setModalVisible(true)}>
+                      <View style={styles.cardFooter}>
+                        <View style={styles.socialBarContainer}>
+                          <View style={styles.socialBarSection}>
+                            {/* <TouchableOpacity style={styles.socialBarButton} onPress={() => this.setModalVisible(true)}>
                       <Icon style={styles.icon} name="shopping-cart" color='#64707a' />
                       <Text style={[styles.socialBarLabel, styles.buyNow]}>Buy Now</Text>
                     </TouchableOpacity> */}
+                          </View>
                         </View>
                       </View>
                     </View>
-                  </View>
 
 
-                  // <View style={styles.cardGroup}>
-                  //   <ImageSlider
-                  //     style={styles.productImg}
-                  //     images={item.products[0].images}
-                  //     customSlide={({ index, item, style, width }) => (
-                  //       // It's important to put style here because it's got offset inside
-                  //       <View
-                  //         key={index}
-                  //         style={[
-                  //           style,
-                  //           {
-                  //             width: 200,
-                  //             height: 200,
-                  //             borderTopLeftRadius: 10,
-                  //             borderTopRightRadius: 10,
-                  //             backgroundColor: "white"
-                  //           }
-                  //         ]}
-                  //       >
-                  //         <Image
-                  //           source={{ uri: item }}
-                  //           style={{
-                  //             width: 200,
-                  //             height: 200
-                  //           }}
-                  //         />
-                  //       </View>
-                  //     )}
-                  //   />
-                  //   <View
-                  //     style={{
-                  //       justifyContent: "center",
-                  //       alignItems: "center",
-                  //       display: "flex"
-                  //     }}
-                  //   >
-                  //     <Text style={styles.title}>{item.title}</Text>
-                  //     <Text style={styles.price}>${item.price}</Text>
-                  //     <Button
-                  //       title="More Details"
-                  //       type="outline"
-                  //       onPress={() =>
-                  //         this.props.navigation.navigate("GroupItemDetail", {
-                  //           item: item.products,
-                  //           group_price: item.price
-                  //         })
-                  //       }
-                  //       buttonStyle={styles.detail_button}
-                  //       titleStyle={styles.detail_button_input}
-                  //     />
-                  //   </View>
+                    // <View style={styles.cardGroup}>
+                    //   <ImageSlider
+                    //     style={styles.productImg}
+                    //     images={item.products[0].images}
+                    //     customSlide={({ index, item, style, width }) => (
+                    //       // It's important to put style here because it's got offset inside
+                    //       <View
+                    //         key={index}
+                    //         style={[
+                    //           style,
+                    //           {
+                    //             width: 200,
+                    //             height: 200,
+                    //             borderTopLeftRadius: 10,
+                    //             borderTopRightRadius: 10,
+                    //             backgroundColor: "white"
+                    //           }
+                    //         ]}
+                    //       >
+                    //         <Image
+                    //           source={{ uri: item }}
+                    //           style={{
+                    //             width: 200,
+                    //             height: 200
+                    //           }}
+                    //         />
+                    //       </View>
+                    //     )}
+                    //   />
+                    //   <View
+                    //     style={{
+                    //       justifyContent: "center",
+                    //       alignItems: "center",
+                    //       display: "flex"
+                    //     }}
+                    //   >
+                    //     <Text style={styles.title}>{item.title}</Text>
+                    //     <Text style={styles.price}>${item.price}</Text>
+                    //     <Button
+                    //       title="More Details"
+                    //       type="outline"
+                    //       onPress={() =>
+                    //         this.props.navigation.navigate("GroupItemDetail", {
+                    //           item: item.products,
+                    //           group_price: item.price
+                    //         })
+                    //       }
+                    //       buttonStyle={styles.detail_button}
+                    //       titleStyle={styles.detail_button_input}
+                    //     />
+                    //   </View>
 
-                  //   <View style={styles.cardFooter}>
-                  //     <View style={styles.socialBarContainer}>
-                  //       <View style={styles.socialBarSection}>
-                  //         <TouchableOpacity
-                  //           style={styles.socialBarButton}
-                  //           onPress={() => this.setModalVisible(true)}
-                  //         >
-                  //           <Icon
-                  //             style={styles.icon}
-                  //             name="shopping-cart"
-                  //             color="#64707a"
-                  //           />
-                  //           <Text
-                  //             style={[styles.socialBarLabel, styles.buyNow]}
-                  //           >
-                  //             Buy Now
-                  //           </Text>
-                  //         </TouchableOpacity>
+                    //   <View style={styles.cardFooter}>
+                    //     <View style={styles.socialBarContainer}>
+                    //       <View style={styles.socialBarSection}>
+                    //         <TouchableOpacity
+                    //           style={styles.socialBarButton}
+                    //           onPress={() => this.setModalVisible(true)}
+                    //         >
+                    //           <Icon
+                    //             style={styles.icon}
+                    //             name="shopping-cart"
+                    //             color="#64707a"
+                    //           />
+                    //           <Text
+                    //             style={[styles.socialBarLabel, styles.buyNow]}
+                    //           >
+                    //             Buy Now
+                    //           </Text>
+                    //         </TouchableOpacity>
 
-                  //         {/* <TouchableOpacity style={styles.socialBarButton} onPress={() => this.setModalVisible(true)}>
-                  //       <Icon style={styles.icon} name="shopping-cart" color='#64707a' />
-                  //       <Text style={[styles.socialBarLabel, styles.buyNow]}>Buy Now</Text>
-                  //     </TouchableOpacity> */}
-                  //       </View>
-                  //     </View>
-                  //   </View>
-                  // </View>
-                );
-                // }
-              }}
+                    //         {/* <TouchableOpacity style={styles.socialBarButton} onPress={() => this.setModalVisible(true)}>
+                    //       <Icon style={styles.icon} name="shopping-cart" color='#64707a' />
+                    //       <Text style={[styles.socialBarLabel, styles.buyNow]}>Buy Now</Text>
+                    //     </TouchableOpacity> */}
+                    //       </View>
+                    //     </View>
+                    //   </View>
+                    // </View>
+                  );
+                  // }
+                }
+              }
+              }
             />
           </Tab>
         </Tabs>
