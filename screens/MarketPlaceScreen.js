@@ -109,7 +109,7 @@ export default class MarketPlaceScreen extends React.Component {
   }
 
   componentWillUnmount() {
-    // Remove the event listener  
+    // Remove the event listener
     this.focusListener.remove();
   }
 
@@ -961,7 +961,7 @@ export default class MarketPlaceScreen extends React.Component {
                             name="md-heart"
                             size={15}
                             color="white"
-                            type='ionicon'
+                            type='Ionicons'
                           />
                         }
                         title="Wish list"

@@ -560,7 +560,7 @@ export default class WishListScreen extends React.Component {
                         name="md-heart"
                         size={15}
                         color="white"
-                        type="ionicon"
+                        type="Ionicons"
                       />
                     }
                     title="Remove from Favourites"

@@ -171,7 +171,7 @@ export default class SignInScreen extends React.Component {
             success = true;
           }
           // else if (response.success == false) {
-          //   
+          //
           //   Alert.alert('Error', response.errors)
           // }
           else {
@@ -201,7 +201,10 @@ export default class SignInScreen extends React.Component {
               "user_id",
               responseJson["data"]["id"].toString()
             );
-            AsyncStorage.setItem('userImage', responseJson["data"].image)
+            if(responseJson["data"].image) {
+              console.log("responseJson[\"data\"].image",responseJson["data"].image)
+                AsyncStorage.setItem('userImage', responseJson["data"].image)
+            }
             AsyncStorage.setItem('firstName', responseJson["data"].firstname)
             AsyncStorage.setItem('lastName', responseJson["data"].lastname)
             this.setState({ Loader: !this.state.Loader })
