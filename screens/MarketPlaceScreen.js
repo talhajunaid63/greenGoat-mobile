@@ -109,7 +109,7 @@ export default class MarketPlaceScreen extends React.Component {
   }
 
   componentWillUnmount() {
-    // Remove the event listener  
+    // Remove the event listener
     this.focusListener.remove();
   }
 
@@ -524,7 +524,7 @@ export default class MarketPlaceScreen extends React.Component {
           fav_product_ids: responseJson.product_id,
           loading: false
         })
-        Alert.alert("Product removed from wish list");
+        Alert.alert("Product removed from favourities");
         await this.renderMyData();
         await this.get_fav_product();
       })
@@ -615,7 +615,7 @@ export default class MarketPlaceScreen extends React.Component {
                 marginTop: 40
               }}
             >
-              <CreditCardInput requiresPostalCode onChange={this._onCardChange} />
+              <CreditCardInput onChange={this._onCardChange} />
               <View
                 style={{
                   margin: 30
@@ -961,7 +961,7 @@ export default class MarketPlaceScreen extends React.Component {
                             name="md-heart"
                             size={15}
                             color="white"
-                            type='ionicon'
+                            type='Ionicons'
                           />
                         }
                         title="Wish list"

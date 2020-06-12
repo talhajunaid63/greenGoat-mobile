@@ -253,7 +253,7 @@ export default class SettingsScreen extends Component {
 
 SettingsScreen.navigationOptions = {
   drawerIcon: ({ tintColor }) => (
-    <Icon name="md-settings" type="ionicon" style={{ fontSize: 20 }} />
+    <Icon name="md-settings"  type="ionicon" style={{ fontSize: 20 }} />
   )
 };
 

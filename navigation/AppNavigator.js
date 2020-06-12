@@ -184,7 +184,7 @@ const CustomDrawer = (props) => {
             props.navigation.navigate("Auth");
           }}
           style={{ flexDirection: "row", alignItems: "center" }}>
-          <Icon name="md-settings" type="ionicon" style={{ fontSize: 25, marginStart: 18, marginEnd: 32, }} />
+          <Icon name="md-settings" type="Ionicons"  style={{ fontSize: 25, marginStart: 18, marginEnd: 32, }} />
           <Text style={{ color: "black", fontWeight: "bold" }}> Logout</Text>
         </TouchableOpacity>
 

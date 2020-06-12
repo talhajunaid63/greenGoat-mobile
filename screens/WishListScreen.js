@@ -422,7 +422,7 @@ export default class WishListScreen extends React.Component {
               </View>
             </View>
             <View style={{ marginTop: 40 }}>
-              <CreditCardInput requiresPostalCode onChange={this._onCardChange} />
+              <CreditCardInput onChange={this._onCardChange} />
               <View style={{ margin: 30 }}>
                 <Button
                   title="Buy"
@@ -560,7 +560,7 @@ export default class WishListScreen extends React.Component {
                         name="md-heart"
                         size={15}
                         color="white"
-                        type="ionicon"
+                        type="Ionicons"
                       />
                     }
                     title="Remove from Favourites"
