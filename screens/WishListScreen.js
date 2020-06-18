@@ -17,6 +17,7 @@ export default class WishListScreen extends React.Component {
           id: "",
           title: "",
           price: "",
+          
           category: "",
           need_uninstallation: "",
           location: "",
@@ -422,7 +423,7 @@ export default class WishListScreen extends React.Component {
               </View>
             </View>
             <View style={{ marginTop: 40 }}>
-              <CreditCardInput onChange={this._onCardChange} />
+              <CreditCardInput requiresPostalCode onChange={this._onCardChange} />
               <View style={{ margin: 30 }}>
                 <Button
                   title="Buy"

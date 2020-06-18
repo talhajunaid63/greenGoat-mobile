@@ -615,7 +615,7 @@ export default class MarketPlaceScreen extends React.Component {
                 marginTop: 40
               }}
             >
-              <CreditCardInput onChange={this._onCardChange} />
+              <CreditCardInput requiresPostalCode onChange={this._onCardChange} />
               <View
                 style={{
                   margin: 30
@@ -659,11 +659,22 @@ export default class MarketPlaceScreen extends React.Component {
             </Text>
             <View style={{ marginTop: 40 }}>
               <View style={styles.inputContainer}>
-                <Text>Minimum Price: ${this.state.minvalue}</Text>
+                <Text>Maximum Price: ${this.state.maxvalue}</Text>
+                <Slider
+                  value={this.state.maxvalue}
+                  minimumValue={0}
+                  onValueChange={value => this.setState({ maxvalue: value })}
+                  maximumValue={10000}
+                  thumbTintColor="#5EA64A"
+                  step={1}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <Text>Minimum Price: ${this.state.minvalue > this.state.maxvalue ? 0 : this.state.minvalue}</Text>
                 <Slider
                   value={this.state.minvalue}
                   minimumValue={0}
-                  maximumValue={1000}
+                  maximumValue={this.state.maxvalue > 11 ? this.state.maxvalue - 10 : this.state.maxvalue}
                   onValueChange={value => this.setState({ minvalue: value })}
                   // maximumValue={this.state.maxvalue > 100 ? this.state.maxvalue - 100 : 0}
                   thumbTintColor="#5EA64A"
@@ -671,17 +682,6 @@ export default class MarketPlaceScreen extends React.Component {
                 />
               </View>
 
-              <View style={styles.inputContainer}>
-                <Text>Maximum Price: ${this.state.maxvalue}</Text>
-                <Slider
-                  value={this.state.maxvalue}
-                  minimumValue={1001}
-                  onValueChange={value => this.setState({ maxvalue: value })}
-                  maximumValue={10000}
-                  thumbTintColor="#5EA64A"
-                  step={1}
-                />
-              </View>
               <View style={styles.inputContainer}>
                 <Text>Category</Text>
                 <Dropdown
@@ -696,7 +696,7 @@ export default class MarketPlaceScreen extends React.Component {
                   pickerStyle={{
                     width: "90%",
                     backgroundColor: "#5EA64A",
-                    color: "white",
+                    // color: "white",
                     marginLeft: 5
                   }}
                   value={this.state.category}
@@ -720,7 +720,7 @@ export default class MarketPlaceScreen extends React.Component {
                   pickerStyle={{
                     width: "90%",
                     backgroundColor: "#5EA64A",
-                    color: "white",
+                    // color: "white",
                     marginLeft: 5
                   }}
                   value={this.state.installation}

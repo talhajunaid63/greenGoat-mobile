@@ -1,6 +1,9 @@
 import Icon from "@expo/vector-icons/Ionicons";
 import React from "react";
-import { Alert, AsyncStorage, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert, AsyncStorage, Image, Modal, ScrollView,
+  StyleSheet, Text, TouchableOpacity, View, Dimensions
+} from "react-native";
 import { CreditCardInput } from "react-native-credit-card-input";
 import { Button, Icon as Icon1 } from "react-native-elements";
 import ImageSlider from "react-native-image-slider";
@@ -11,6 +14,7 @@ import { BASE_URL } from "../config/NetworkConstants";
 export default class ProductDetailScreen extends React.Component {
   constructor(props) {
     const item = props.navigation.state.params.item;
+
 
     super(props);
     this.state = {
@@ -265,8 +269,11 @@ export default class ProductDetailScreen extends React.Component {
   };
 
   render() {
+
     const item = this.props.navigation.state.params.item;
-    console.log('ssssssss', item)
+    const window = Dimensions.get('window');
+
+    console.log('ssssssss', window.height)
     const fav = this.state.fav_product_ids && this.state.fav_product_ids.find(element => element == item.id);
     return (
       <View style={styles.container}>
@@ -324,6 +331,7 @@ export default class ProductDetailScreen extends React.Component {
               </View>
               <View style={{ marginTop: 40 }}>
                 <CreditCardInput
+                  requiresPostalCode
                   onChange={this._onCardChange}
                 />
                 <View style={{ marginTop: 30 }}>
@@ -352,22 +360,51 @@ export default class ProductDetailScreen extends React.Component {
             transparent={false}
             visible={this.state.imageModal}
             onRequestClose={() => { }}
+            style={{ backgroundColor: "#8deb73", }}
           >
-            <View
-              style={{ paddingTop: 22, backgroundColor: "#8deb73", flex: 1, justifyContent: "center", alignItems: "center" }}
-            >
-              <Image
-                style={{ width: "90%", height: "auto", aspectRatio: 1, marginBottom: 20 }}
-                source={{ uri: this.selectedItem }}
-              />
-              <Button
-                buttonStyle={styles.button}
-                title="Go Back"
-                titleStyle={{ fontSize: 20 }}
-                raised={true}
-                onPress={() => this.setState({ imageModal: false })}
-              />
+            <View style={{ flexGrow: 1, justifyContent: "space-between", alignItems: 'center', backgroundColor: "green" }}>
+              <ImageSlider
+                style={{
+                  // flex: 1,
+                  width: window.width,
+                  height: window.height,
+                  // width: 200,
+                  // height: 200,
+                  borderRadius: 10,
 
+                }}
+                images={item.images}
+                customSlide={({ index, item, style, width }) => {
+                  this.selectedItem = item
+                  return (
+                    // It's important to put style here because it's got offset inside
+                    <View
+                      key={index}
+                      style={{
+                        backgroundColor: "#8deb73", flexGrow: 1,
+                        justifyContent: "center", alignItems: "center"
+                      }}
+                    >
+                      <Image
+                        style={{ width: window.width, height: window.height, }}
+                        source={{ uri: this.selectedItem }}
+                        resizeMode="cover"
+                      />
+
+                    </View>
+                  )
+                }}
+              />
+              <View style={{ marginVertical: 20 }}>
+
+                <Button
+                  buttonStyle={styles.button}
+                  title="Go Back"
+                  titleStyle={{ fontSize: 20 }}
+                  raised={true}
+                  onPress={() => this.setState({ imageModal: false })}
+                />
+              </View>
             </View>
           </Modal>
           <View
@@ -383,6 +420,7 @@ export default class ProductDetailScreen extends React.Component {
               images={item.images}
               customSlide={({ index, item, style, width }) => {
                 this.selectedItem = item
+                console.log('dddddddd', item)
                 return (
                   // It's important to put style here because it's got offset inside
                   <TouchableOpacity
@@ -456,7 +494,7 @@ export default class ProductDetailScreen extends React.Component {
             </Table>
           </View>
         </ScrollView>
-      </View>
+      </View >
     );
   }
 }

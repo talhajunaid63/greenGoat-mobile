@@ -473,7 +473,8 @@ export default class RequestItemScreen extends React.Component {
                             </View>
                         </View>
                         <View style={{ marginTop: 40 }}>
-                            <CreditCardInput onChange={this._onChange} />
+                            <CreditCardInput requiresPostalCode
+                                onChange={this._onChange} />
                             <View style={{ margin: 30 }}>
                                 <Button
                                     title="Buy"

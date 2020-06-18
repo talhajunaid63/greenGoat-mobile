@@ -264,6 +264,7 @@ export default class GroupItemDetailScreen extends React.Component {
               </View>
               <View style={{ marginTop: 40 }}>
                 <CreditCardInput
+                  requiresPostalCode
                   onChange={this._onCardChange}
                 />
                 <View style={{ marginTop: 30 }}>
