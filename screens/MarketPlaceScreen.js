@@ -670,7 +670,8 @@ export default class MarketPlaceScreen extends React.Component {
                 />
               </View>
               <View style={styles.inputContainer}>
-                <Text>Minimum Price: ${this.state.minvalue > this.state.maxvalue ? 0 : this.state.minvalue}</Text>
+                <Text>Minimum Price: ${
+                  this.state.minvalue > this.state.maxvalue ? this.state.maxvalue == 0 ? this.state.maxvalue : this.state.maxvalue - 10 : this.state.minvalue}</Text>
                 <Slider
                   value={this.state.minvalue}
                   minimumValue={0}
