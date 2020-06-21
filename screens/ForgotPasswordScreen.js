@@ -47,11 +47,8 @@ export default class SignInScreen extends React.Component {
       >
         <KeyboardAwareScrollView enableOnAndroid={true}>
           <View>
-            {this.state.Loader === true && (
-              <View style={{ justifyContent: "center", alignItems: "center" }}>
                 <Loader LoaderVisibles={this.state.Loader} />
-              </View>
-            )}
+
             <View style={styles.sign_in_page}>
               <Image
                 style={{ width: 220, height: 160 }}

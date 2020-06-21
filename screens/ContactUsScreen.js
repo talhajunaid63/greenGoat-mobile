@@ -72,13 +72,10 @@ export default class ContactUsScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {this.state.modalShow &&
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <Loader
+          <Loader
               LoaderVisibles={this.state.modalShow}
             />
-          </View>
-        }
+
         <Header
           backgroundColor={"#089D37"}
           leftComponent={

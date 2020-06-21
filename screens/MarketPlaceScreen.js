@@ -155,9 +155,9 @@ export default class MarketPlaceScreen extends React.Component {
     // );
 
     // url.search = new URLSearchParams(data).toString();
-    console.log(await AsyncStorage.getItem("userToken"),
-      await AsyncStorage.getItem("uid"),
-      await AsyncStorage.getItem("client"))
+    // console.log(await AsyncStorage.getItem("userToken"),
+    //   await AsyncStorage.getItem("uid"),
+    //   await AsyncStorage.getItem("client"))
     fetch(url, {
       method: "GET",
       headers: {
@@ -172,16 +172,25 @@ export default class MarketPlaceScreen extends React.Component {
       .then(responseJson => {
         // this.setState({ name : responseJson["name"] })
         // this.setState({ email : responseJson["email"] })
-        Promise.resolve(this.get_group_items())
+        console.log("responseJson",responseJson)
+        //Promise.resolve(this.get_group_items())
+        console.log("responseJson after,",responseJson)
         this.setState({
+          loading: false,
           data: responseJson,
           backup_data: responseJson,
           progress: true,
-          loading: false
+
         });
+        console.log("Calling After setstate")
       })
       .catch(error => {
-        console.log("bbbbbbbb", error);
+        this.setState({
+          loading: false,
+          data: [],
+          backup_data: [],
+
+        });
         throw error;
       });
   }
@@ -206,6 +215,7 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
+        console.log("responseJson group item", responseJson)
         this.setState({
           group_items: responseJson,
           backup_data_group: responseJson
@@ -236,7 +246,8 @@ export default class MarketPlaceScreen extends React.Component {
           catData.push({ value: cat.name, id: cat.id });
         });
         this.setState({
-          categorydata: catData
+          categorydata: catData,
+          loading: false
         });
       })
       .catch(error => {
@@ -555,11 +566,10 @@ export default class MarketPlaceScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        {this.state.loading === true && (
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
+
+
             <Loader LoaderVisibles={this.state.loading} />
-          </View>
-        )}
+
         <Modal
           animationType="slide"
           transparent={false}
