@@ -8,7 +8,7 @@ import { Dropdown } from "react-native-material-dropdown";
 import back from "../assets/images/back.png";
 import filterr from "../assets/images/filterr.png";
 import { BASE_URL } from "../config/NetworkConstants";
-import Loader from "./Loader";
+import Loader from "./NewLoader";
 
 // import MultiSlider from "@ptomasroos/react-native-multi-slider";
 export default class MarketPlaceScreen extends React.Component {
