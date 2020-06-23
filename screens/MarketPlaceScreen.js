@@ -70,20 +70,15 @@ export default class MarketPlaceScreen extends React.Component {
       fav_product_ids: [],
       minvalue: 0,
       maxvalue: 10000,
-      category: "Electronics",
+      category: "All Categories",
       installation: "No",
       progress: true,
       categoryid: -1,
       categorydata: [
         {
-          value: "Electronics"
+          value: "All Category",
+          id: null
         },
-        {
-          value: "Furniture"
-        },
-        {
-          value: "Mobile"
-        }
       ],
       installationdata: [
         {
@@ -172,9 +167,9 @@ export default class MarketPlaceScreen extends React.Component {
       .then(responseJson => {
         // this.setState({ name : responseJson["name"] })
         // this.setState({ email : responseJson["email"] })
-        console.log("responseJson",responseJson)
+        console.log("responseJson", responseJson)
         //Promise.resolve(this.get_group_items())
-        console.log("responseJson after,",responseJson)
+        console.log("responseJson after,", responseJson)
         this.setState({
           loading: false,
           data: responseJson,
@@ -229,7 +224,6 @@ export default class MarketPlaceScreen extends React.Component {
 
   async get_categories_data() {
     var url = new URL(BASE_URL + "/products/categories");
-
     fetch(url, {
       method: "GET",
       headers: {
@@ -241,7 +235,13 @@ export default class MarketPlaceScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-        let catData = [];
+        console.log(responseJson.categories)
+        let catData = [
+          {
+            value: "All Categories",
+            id: ''
+          },
+        ];
         responseJson.categories.map(cat => {
           catData.push({ value: cat.name, id: cat.id });
         });
@@ -568,7 +568,7 @@ export default class MarketPlaceScreen extends React.Component {
       <View style={styles.container}>
 
 
-            <Loader LoaderVisibles={this.state.loading} />
+        <Loader LoaderVisibles={this.state.loading} />
 
         <Modal
           animationType="slide"
@@ -772,7 +772,7 @@ export default class MarketPlaceScreen extends React.Component {
                       this.state.data = this.state.backup_data
                       this.setState({
                         categoryid: -1, maxvalue: 10000, minvalue: 0,
-                        category: '',
+                        category: 'All Categories',
                         data: this.state.backup_data
                       })
                       this.setState({ filtermodalVisible: !this.state.filtermodalVisible });
