@@ -35,7 +35,7 @@
     ],
     "ios": {
       "bundleIdentifier": "com.cloudevvz.greengoat",
-      "buildNumber": "7",
+      "buildNumber": "8",
       "supportsTablet": true
     },
     "android": {
