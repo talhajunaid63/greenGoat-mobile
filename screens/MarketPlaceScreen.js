@@ -114,10 +114,11 @@ export default class MarketPlaceScreen extends React.Component {
 
   async renderMyData() {
     this.setState({ loading: true })
-    if (this.state.categoryid !== -1 && this.state.maxvalue != -1) {
+    if (this.state.categoryid !== -1 && this.state.categoryid !== null && this.state.maxvalue != -1) {
       var url = BASE_URL + `products?q[category_id]=${this.state.categoryid}&q[min_price]=${this.state.minvalue}&q[max_price]=${this.state.maxvalue}`;
     }
-    else if (this.state.categoryid != -1) {
+    else if (this.state.categoryid != -1 && this.state.categoryid !== null) {
+
       var url = BASE_URL + `products?q[category_id]=${this.state.categoryid}`;
 
     }
@@ -280,7 +281,8 @@ export default class MarketPlaceScreen extends React.Component {
     data = this.state.backup_data;
     data_group = this.state.backup_data_group;
     if (this.state.categoryid === -1) {
-      this.state.categoryid = 1;
+      this.state.categoryid = null
+      this.setState({ categoryid: null });
     }
     this.renderMyData();
 
@@ -466,8 +468,9 @@ export default class MarketPlaceScreen extends React.Component {
         if (responseJson.message) {
           this.selectedItem = null
           Alert.alert(responseJson.message)
-          await this.setModalVisible(false);
           await this.renderMyData()
+          await this.get_group_items()
+          await this.setModalVisible(false);
         }
 
       })
@@ -509,7 +512,7 @@ export default class MarketPlaceScreen extends React.Component {
           this.getPaymentDone(jsonRespone.id)
         }
       }).catch((error => {
-        console.log("error i  payment:", error)
+        console.log("error payment:", error)
       }));
     }
   };
