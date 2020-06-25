@@ -73,7 +73,7 @@ export default class MarketPlaceScreen extends React.Component {
       category: "All Categories",
       installation: "No",
       progress: true,
-      categoryid: -1,
+      categoryid: null,
       categorydata: [
         {
           value: "All Category",
@@ -277,13 +277,15 @@ export default class MarketPlaceScreen extends React.Component {
   };
 
   filter_submit = () => {
+    console.log(this.state.categoryid)
+    debugger
     this.setState({ filtermodalVisible: !this.state.filtermodalVisible });
     data = this.state.backup_data;
     data_group = this.state.backup_data_group;
-    if (this.state.categoryid === -1) {
-      this.state.categoryid = null
-      this.setState({ categoryid: null });
-    }
+    // if (this.state.categoryid === -1) {
+    //   this.state.categoryid = null
+    //   this.setState({ categoryid: null });
+    // }
     this.renderMyData();
 
     data = data.filter(l => {
@@ -550,8 +552,6 @@ export default class MarketPlaceScreen extends React.Component {
 
   _onCardChange = form => {
     // console.log(form);
-
-
     this.setState({
       buy_button_disabled: false,
       number: form["values"]["number"],
@@ -763,18 +763,18 @@ export default class MarketPlaceScreen extends React.Component {
                   onPress={this.filter_submit}
                 />
               </View>
-              {this.state.categoryid != -1 && this.state.maxvalue ? (
+              {this.state.categoryid != null && this.state.maxvalue ? (
                 <View style={[styles.inputContainer, { marginVertical: 10, }]}>
                   <Button
                     title="Clear filters"
                     buttonStyle={{ backgroundColor: "#106304" }}
                     onPress={async () => {
-                      this.state.categoryid = -1
+                      this.state.categoryid = null
                       this.state.maxvalue = 10000
                       this.state.minvalue = 0
                       this.state.data = this.state.backup_data
                       this.setState({
-                        categoryid: -1, maxvalue: 10000, minvalue: 0,
+                        categoryid: null, maxvalue: 10000, minvalue: 0,
                         category: 'All Categories',
                         data: this.state.backup_data
                       })
