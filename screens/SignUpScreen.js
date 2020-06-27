@@ -471,11 +471,11 @@ export default class SignUpScreen extends React.Component {
     if (firstname && lastname && email && password && password_confirmation && phone && role) {
       if (terms) {
         if (password === password_confirmation) {
-          this.setState({
-            errormessage: "In progress....",
-            errortitle: " "
-          });
-          this.showAlert();
+          // this.setState({
+          //   errormessage: "In progress....",
+          //   errortitle: " "
+          // });
+          // this.showAlert();
           fetch(BASE_URL + "auth", {
             method: "POST",
             headers: {
@@ -500,7 +500,7 @@ export default class SignUpScreen extends React.Component {
           })
             .then(response => response.json())
             .then(responseJson => {
-
+              debugger
               if (responseJson["status"] == 'success') {
                 // this.hideAlert();
                 this.setState({
@@ -508,18 +508,23 @@ export default class SignUpScreen extends React.Component {
                   errortitle: "Success",
                   signup_success: "true"
                 });
-
+                debugger
                 this.showAlert();
                 // Alert.alert("Please check your email to confirm registration")
-              } else {
+              }
+              else if (responseJson['status' === 'error']) {
+
+              }
+
+              else {
 
                 // this.hideAlert();
-                this.setState({
-                  // errormessage: responseJson["errors"].full_messages[0],
-                  errortitle: "Error"
-                });
-                this.showAlert();
-                // Alert.alert(responseJson["errors"].full_messages[0])
+                // this.setState({
+                //   errormessage: responseJson["errors"].full_messages[0],
+                //   errortitle: "Error"
+                // });
+                // this.showAlert();
+                Alert.alert(responseJson["errors"].full_messages[0])
               }
             })
 

@@ -20,14 +20,14 @@ export default class ProductDetailScreen extends React.Component {
     this.state = {
       imageModal: false,
       tableData: [
-        ["Dimensions", item.width + "x" + item.height],
+        ["Dimensions", item.width + "x" + item.height + "x" + item.depth],
         ["Weight", item.weight],
         ["Category", item.category],
-        ["Location", item.address],
-        ["Depth", item.depth],
+        ["Location", item.city + " " + item.state] ,
+        // ["width*heigth*depth", item.depth],
         ["Serial", item.serial],
         ["Count", item.count],
-        ["Depth", item.depth],
+        // ["Depth", item.depth],
         ["Make", item.make]
       ],
       modalVisible: false,
@@ -222,7 +222,6 @@ export default class ProductDetailScreen extends React.Component {
     })
       .then(response => response.json())
       .then(responseJson => {
-
         this.setState(
           {
             fav_product_ids: responseJson["product_ids"],
@@ -272,8 +271,8 @@ export default class ProductDetailScreen extends React.Component {
 
     const item = this.props.navigation.state.params.item;
     const window = Dimensions.get('window');
-
-    console.log('ssssssss', window.height)
+    debugger
+    console.log('ssssssss', item)
     const fav = this.state.fav_product_ids && this.state.fav_product_ids.find(element => element == item.id);
     return (
       <View style={styles.container}>
